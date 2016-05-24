@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Resampling strategies &mdash; AutoSklearn 0.0.1dev documentation</title>
+    <title>Manual &mdash; AutoSklearn 0.0.1dev documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -73,7 +73,7 @@
                 <li><a href="index.html">Start</a></li>
                 <li><a href="api.html">API</a></li>
                 <li><a href="extending.html">Extending</a></li>
-                <li><a href="#">Resampling</a></li>
+                <li><a href="#">Manual</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -112,17 +112,42 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#">Resampling strategies</a></li>
+<li><a class="reference internal" href="#">Manual</a><ul>
+<li><a class="reference internal" href="#resampling-strategies">Resampling strategies</a></li>
+<li><a class="reference internal" href="#parallel-computation">Parallel computation</a></li>
+<li><a class="reference internal" href="#model-persistence">Model persistence</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <div class="section" id="resampling-strategies">
-<span id="resampling"></span><h1>Resampling strategies<a class="headerlink" href="#resampling-strategies" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="manual">
+<span id="id1"></span><h1>Manual<a class="headerlink" href="#manual" title="Permalink to this headline">¶</a></h1>
+<p>This manual shows how to use several aspects of auto-sklearn. It either
+references the examples where possible or explains certain configurations.</p>
+<div class="section" id="resampling-strategies">
+<h2>Resampling strategies<a class="headerlink" href="#resampling-strategies" title="Permalink to this headline">¶</a></h2>
 <p>Examples for using holdout and cross-validation can be found in the example
-directory.</p>
+directory of auto-sklearn.</p>
+</div>
+<div class="section" id="parallel-computation">
+<h2>Parallel computation<a class="headerlink" href="#parallel-computation" title="Permalink to this headline">¶</a></h2>
+<p>auto-sklearn supports parallel execution by data sharing on a shared file
+system. In this mode, the SMAC algorithm shares the training data for it&#8217;s
+model by writing it to disk after every iteration. At the beginning of each
+iteration, SMAC loads all newly found data points. An example can be found in
+the example directory.</p>
+</div>
+<div class="section" id="model-persistence">
+<h2>Model persistence<a class="headerlink" href="#model-persistence" title="Permalink to this headline">¶</a></h2>
+<p>auto-sklearn is mostly a wrapper around scikit-learn. Therefore, it is
+possible to follow the <a href="#id2"><span class="problematic" id="id3">`persistence example
+http://scikit-learn.org/stable/modules/model_persistence.html#persistence-example`_</span></a>
+from scikit-learn.</p>
+</div>
 </div>
 
 
@@ -138,7 +163,7 @@ directory.</p>
         <br/>
         
 <div id="sourcelink">
-  <a href="_sources/resampling.txt"
+  <a href="_sources/manual.txt"
      rel="nofollow">Source</a>
 </div>
       

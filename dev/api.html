@@ -73,7 +73,7 @@
                 <li><a href="index.html">Start</a></li>
                 <li><a href="#">API</a></li>
                 <li><a href="extending.html">Extending</a></li>
-                <li><a href="resampling.html">Resampling</a></li>
+                <li><a href="manual.html">Manual</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -130,7 +130,7 @@
 <dl class="class">
 <dt id="autosklearn.classification.AutoSklearnClassifier">
 <em class="property">class </em><code class="descclassname">autosklearn.classification.</code><code class="descname">AutoSklearnClassifier</code><span class="sig-paren">(</span><em>time_left_for_this_task=3600</em>, <em>per_run_time_limit=360</em>, <em>initial_configurations_via_metalearning=25</em>, <em>ensemble_size=50</em>, <em>ensemble_nbest=50</em>, <em>seed=1</em>, <em>ml_memory_limit=3000</em>, <em>include_estimators=None</em>, <em>include_preprocessors=None</em>, <em>resampling_strategy='holdout'</em>, <em>resampling_strategy_arguments=None</em>, <em>tmp_folder=None</em>, <em>output_folder=None</em>, <em>delete_tmp_folder_after_terminate=True</em>, <em>delete_output_folder_after_terminate=True</em>, <em>shared_mode=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autosklearn/estimators.html#AutoSklearnClassifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier" title="Permalink to this definition">¶</a></dt>
-<dd><p>This class implements the classification task. It must not be pickled!</p>
+<dd><p>This class implements the classification task.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -262,6 +262,21 @@ md5 hash of the dataset.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="autosklearn.classification.AutoSklearnClassifier.fit_ensemble">
+<code class="descname">fit_ensemble</code><span class="sig-paren">(</span><em>task=None</em>, <em>metric=None</em>, <em>precision='32'</em>, <em>dataset_name=None</em>, <em>ensemble_nbest=None</em>, <em>ensemble_size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.fit_ensemble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the ensemble.</p>
+<p>This method only needs to be called in the parallel mode.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="autosklearn.classification.AutoSklearnClassifier.predict">
 <code class="descname">predict</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autosklearn/estimators.html#AutoSklearnClassifier.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict classes for X.</p>
@@ -298,6 +313,51 @@ md5 hash of the dataset.</p>
 <div><p>The predicted class probabilities.</p>
 </div></blockquote>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="autosklearn.classification.AutoSklearnClassifier.refit">
+<code class="descname">refit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.refit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refit all models found with fit to new data.</p>
+<p>Necessary when using cross-validation. During training, auto-sklearn
+fits each model k times on the dataset, but does not keep any trained
+model and can therefore not be used to predict for new data points.
+This methods fits all models found during a call to fit on the data
+given. This method may also be used together with holdout to avoid
+only using 66% of the training data to fit the final model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : array-like or sparse matrix of shape = [n_samples, n_features]</p>
+<blockquote>
+<div><p>The training input samples.</p>
+</div></blockquote>
+<p><strong>y</strong> : array-like, shape = [n_samples] or [n_samples, n_outputs]</p>
+<blockquote>
+<div><p>The target classes.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">self</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="autosklearn.classification.AutoSklearnClassifier.show_models">
+<code class="descname">show_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.show_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a representation of the final ensemble found by auto-sklearn</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str</td>
 </tr>
 </tbody>
 </table>

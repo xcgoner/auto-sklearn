@@ -118,7 +118,7 @@
     <div class="col-md-9 content">
       
   <h1>Source code for autosklearn.pipeline.components.base</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">pkgutil</span>
@@ -179,7 +179,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Property </span><span class="si">%s</span><span class="s1"> not specified for algorithm </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">classifier</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">classifier</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">classifier</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="AutoSklearnClassificationAlgorithm"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnClassificationAlgorithm">[docs]</a><span class="k">class</span> <span class="nc">AutoSklearnClassificationAlgorithm</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -189,11 +189,11 @@
 <span class="sd">    See :ref:`extending` for more information.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="AutoSklearnClassificationAlgorithm.get_properties"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnClassificationAlgorithm.get_properties">[docs]</a>    <span class="k">def</span> <span class="nf">get_properties</span><span class="p">(</span><span class="n">dataset_properties</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoSklearnClassificationAlgorithm.get_properties"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnClassificationAlgorithm.get_properties">[docs]</a>    <span class="k">def</span> <span class="nf">get_properties</span><span class="p">(</span><span class="n">dataset_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get the properties of the underlying algorithm.</span>
 
 <span class="sd">        Find more information at :ref:`get_properties`</span>
@@ -210,7 +210,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="AutoSklearnClassificationAlgorithm.get_hyperparameter_search_space"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnClassificationAlgorithm.get_hyperparameter_search_space">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperparameter_search_space</span><span class="p">(</span><span class="n">dataset_properties</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoSklearnClassificationAlgorithm.get_hyperparameter_search_space"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnClassificationAlgorithm.get_hyperparameter_search_space">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperparameter_search_space</span><span class="p">(</span><span class="n">dataset_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the configuration space of this classification algorithm.</span>
 
 <span class="sd">        Parameters</span>
@@ -302,10 +302,10 @@
 <span class="sd">    See :ref:`extending` for more information.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="AutoSklearnPreprocessingAlgorithm.get_properties"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm.get_properties">[docs]</a>    <span class="k">def</span> <span class="nf">get_properties</span><span class="p">(</span><span class="n">dataset_properties</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoSklearnPreprocessingAlgorithm.get_properties"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm.get_properties">[docs]</a>    <span class="k">def</span> <span class="nf">get_properties</span><span class="p">(</span><span class="n">dataset_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get the properties of the underlying algorithm.</span>
 
 <span class="sd">        Find more information at :ref:`get_properties`</span>
@@ -322,7 +322,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="AutoSklearnPreprocessingAlgorithm.get_hyperparameter_search_space"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm.get_hyperparameter_search_space">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperparameter_search_space</span><span class="p">(</span><span class="n">dataset_properties</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoSklearnPreprocessingAlgorithm.get_hyperparameter_search_space"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm.get_hyperparameter_search_space">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperparameter_search_space</span><span class="p">(</span><span class="n">dataset_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the configuration space of this preprocessing algorithm.</span>
 
 <span class="sd">        Parameters</span>
@@ -401,10 +401,10 @@
 <span class="sd">    `autosklearn/pipeline/components/regression` to make it available.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="AutoSklearnRegressionAlgorithm.get_properties"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnRegressionAlgorithm.get_properties">[docs]</a>    <span class="k">def</span> <span class="nf">get_properties</span><span class="p">(</span><span class="n">dataset_properties</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoSklearnRegressionAlgorithm.get_properties"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnRegressionAlgorithm.get_properties">[docs]</a>    <span class="k">def</span> <span class="nf">get_properties</span><span class="p">(</span><span class="n">dataset_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get the properties of the underlying algorithm.</span>
 
 <span class="sd">        Find more information at :ref:`get_properties`</span>
@@ -421,7 +421,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="AutoSklearnRegressionAlgorithm.get_hyperparameter_search_space"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnRegressionAlgorithm.get_hyperparameter_search_space">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperparameter_search_space</span><span class="p">(</span><span class="n">dataset_properties</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AutoSklearnRegressionAlgorithm.get_hyperparameter_search_space"><a class="viewcode-back" href="../../../../api.html#autosklearn.pipeline.components.base.AutoSklearnRegressionAlgorithm.get_hyperparameter_search_space">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperparameter_search_space</span><span class="p">(</span><span class="n">dataset_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the configuration space of this regression algorithm.</span>
 
 <span class="sd">        Parameters</span>
@@ -509,7 +509,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2016, Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Tobias Springenberg, Manuel Blum, Frank Hutter.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.<br/>
     </p>
   </div>
 </footer>

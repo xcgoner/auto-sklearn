@@ -130,7 +130,138 @@
 <dl class="class">
 <dt id="autosklearn.classification.AutoSklearnClassifier">
 <em class="property">class </em><code class="descclassname">autosklearn.classification.</code><code class="descname">AutoSklearnClassifier</code><span class="sig-paren">(</span><em>time_left_for_this_task=3600</em>, <em>per_run_time_limit=360</em>, <em>initial_configurations_via_metalearning=25</em>, <em>ensemble_size=50</em>, <em>ensemble_nbest=50</em>, <em>seed=1</em>, <em>ml_memory_limit=3000</em>, <em>include_estimators=None</em>, <em>include_preprocessors=None</em>, <em>resampling_strategy='holdout'</em>, <em>resampling_strategy_arguments=None</em>, <em>tmp_folder=None</em>, <em>output_folder=None</em>, <em>delete_tmp_folder_after_terminate=True</em>, <em>delete_output_folder_after_terminate=True</em>, <em>shared_mode=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autosklearn/estimators.html#AutoSklearnClassifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<dd><p>This class implements the classification task.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>time_left_for_this_task</strong> : int, optional (default=3600)</p>
+<blockquote>
+<div><p>Time limit in seconds for the search of appropriate
+models. By increasing this value, <em>auto-sklearn</em> will find better
+configurations.</p>
+</div></blockquote>
+<p><strong>per_run_time_limit</strong> : int, optional (default=360)</p>
+<blockquote>
+<div><p>Time limit for a single call to machine learning model.</p>
+</div></blockquote>
+<p><strong>initial_configurations_via_metalearning</strong> : int, optional (default=25)</p>
+<p><strong>ensemble_size</strong> : int, optional (default=50)</p>
+<p><strong>ensemble_nbest</strong> : int, optional (default=50)</p>
+<p><strong>seed</strong> : int, optional (default=1)</p>
+<p><strong>ml_memory_limit</strong> : int, optional (3000)</p>
+<blockquote>
+<div><p>Memory limit for the machine learning algorithm. If the machine
+learning algorithm allocates tries to allocate more memory,
+its evaluation will be stopped.</p>
+</div></blockquote>
+<p><strong>include_estimators</strong> : dict, optional (None)</p>
+<blockquote>
+<div><p>If None all possible estimators are used. Otherwise specifies set of
+estimators to use</p>
+</div></blockquote>
+<p><strong>include_preprocessors</strong> : dict, optional (None)</p>
+<blockquote>
+<div><p>If None all possible preprocessors are used. Otherwise specifies set of
+preprocessors to use</p>
+</div></blockquote>
+<p><strong>resampling_strategy</strong> : string, optional (&#8216;holdout&#8217;)</p>
+<blockquote>
+<div><p>how to to handle overfitting, might need &#8216;resampling_strategy_arguments&#8217;</p>
+<ul class="simple">
+<li>&#8216;holdout&#8217;: 66:33 (train:test) split</li>
+<li>&#8216;holdout-iterative-fit&#8217;:  66:33 (train:test) split, calls iterative
+fit where possible</li>
+<li>&#8216;cv&#8217;: crossvalidation, requires &#8216;folds&#8217;</li>
+<li>&#8216;nested-cv&#8217;: crossvalidation, requires &#8216;outer-folds, &#8216;inner-folds&#8217;</li>
+<li>&#8216;partial-cv&#8217;: crossvalidation, requires &#8216;folds&#8217; , calls
+iterative fit where possible</li>
+</ul>
+</div></blockquote>
+<p><strong>resampling_strategy_arguments</strong> : dict, optional if &#8216;holdout&#8217; (None)</p>
+<blockquote>
+<div><p>Additional arguments for resampling_strategy
+* &#8216;holdout&#8217;: None
+* &#8216;holdout-iterative-fit&#8217;:  None
+* &#8216;cv&#8217;: {&#8216;folds&#8217;: int}
+* &#8216;nested-cv&#8217;: {&#8216;outer_folds&#8217;: int, &#8216;inner_folds&#8217;
+* &#8216;partial-cv&#8217;: {&#8216;folds&#8217;: int}</p>
+</div></blockquote>
+<p><strong>tmp_folder</strong> : string, optional (None)</p>
+<blockquote>
+<div><p>folder to store configuration output, if None automatically use
+/tmp/autosklearn_tmp_$pid_$random_number</p>
+</div></blockquote>
+<p><strong>output_folder</strong> : string, optional (None)</p>
+<blockquote>
+<div><p>folder to store trained models, if None automatically use
+/tmp/autosklearn_output_$pid_$random_number</p>
+</div></blockquote>
+<p><strong>delete_tmp_folder_after_terminate: string, optional (True)</strong></p>
+<blockquote>
+<div><p>remove tmp_folder, when finished. If tmp_folder is None
+tmp_dir will always be deleted</p>
+</div></blockquote>
+<p><strong>delete_output_folder_after_terminate: bool, optional (True)</strong></p>
+<blockquote>
+<div><p>remove output_folder, when finished. If output_folder is None
+output_dir will always be deleted</p>
+</div></blockquote>
+<p><strong>shared_mode: bool, optional (False)</strong></p>
+<blockquote class="last">
+<div><p>run smac in shared-model-node. This only works if arguments
+tmp_folder and output_folder are given and sets both
+delete_tmp_folder_after_terminate and
+delete_output_folder_after_terminate to False.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="autosklearn.classification.AutoSklearnClassifier.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>metric='acc_metric'</em>, <em>feat_type=None</em>, <em>dataset_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autosklearn/estimators.html#AutoSklearnClassifier.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit <em>autosklearn</em> to given training set (X, y).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : array-like or sparse matrix of shape = [n_samples, n_features]</p>
+<blockquote>
+<div><p>The training input samples.</p>
+</div></blockquote>
+<p><strong>y</strong> : array-like, shape = [n_samples] or [n_samples, n_outputs]</p>
+<blockquote>
+<div><p>The target classes.</p>
+</div></blockquote>
+<p><strong>metric</strong> : str, optional (default=&#8217;acc_metric&#8217;)</p>
+<blockquote>
+<div><p>The metric to optimize for. Can be one of: [&#8216;acc_metric&#8217;,
+&#8216;auc_metric&#8217;, &#8216;bac_metric&#8217;, &#8216;f1_metric&#8217;, &#8216;pac_metric&#8217;]. A
+description of the metrics can be found in <a class="reference external" href="http://www.causality.inf.ethz.ch/AutoML/automl_ijcnn15.pdf">the paper describing
+the AutoML Challenge</a>.</p>
+</div></blockquote>
+<p><strong>feat_type</strong> : list, optional (default=None)</p>
+<blockquote>
+<div><p>List of str of <cite>len(X.shape[1])</cite> describing the attribute type.
+Possible types are <cite>Categorical</cite> and <cite>Numerical</cite>. <cite>Categorical</cite>
+attributes will be automatically One-Hot encoded.</p>
+</div></blockquote>
+<p><strong>dataset_name</strong> : str, optional (default=None)</p>
+<blockquote>
+<div><p>Create nicer output. If None, a string will be determined by the
+md5 hash of the dataset.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">self</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="autosklearn.classification.AutoSklearnClassifier.get_params">
 <code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.get_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parameters for this estimator.</p>
@@ -156,6 +287,79 @@ contained subobjects that are estimators.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="autosklearn.classification.AutoSklearnClassifier.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autosklearn/estimators.html#AutoSklearnClassifier.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict classes for X.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : array-like or sparse matrix of shape = [n_samples, n_features]</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>y</strong> : array of shape = [n_samples] or [n_samples, n_labels]</p>
+<blockquote class="last">
+<div><p>The predicted classes.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="autosklearn.classification.AutoSklearnClassifier.predict_proba">
+<code class="descname">predict_proba</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autosklearn/estimators.html#AutoSklearnClassifier.predict_proba"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict probabilities of classes for all samples X.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : array-like or sparse matrix of shape = [n_samples, n_features]</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>y</strong> : array of shape = [n_samples, n_classes] or [n_samples, n_labels]</p>
+<blockquote class="last">
+<div><p>The predicted class probabilities.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="autosklearn.classification.AutoSklearnClassifier.refit">
+<code class="descname">refit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.refit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refit all models found with fit to new data.</p>
+<p>Necessary when using cross-validation. During training, auto-sklearn
+fits each model k times on the dataset, but does not keep any trained
+model and can therefore not be used to predict for new data points.
+This methods fits all models found during a call to fit on the data
+given. This method may also be used together with holdout to avoid
+only using 66% of the training data to fit the final model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : array-like or sparse matrix of shape = [n_samples, n_features]</p>
+<blockquote>
+<div><p>The training input samples.</p>
+</div></blockquote>
+<p><strong>y</strong> : array-like, shape = [n_samples] or [n_samples, n_outputs]</p>
+<blockquote>
+<div><p>The targets.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">self</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="autosklearn.classification.AutoSklearnClassifier.set_params">
 <code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.set_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the parameters of this estimator.</p>
@@ -168,6 +372,264 @@ component of a nested object.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="autosklearn.classification.AutoSklearnClassifier.show_models">
+<code class="descname">show_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.show_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a representation of the final ensemble found by auto-sklearn</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="autosklearn.regression.AutoSklearnRegressor">
+<em class="property">class </em><code class="descclassname">autosklearn.regression.</code><code class="descname">AutoSklearnRegressor</code><span class="sig-paren">(</span><em>time_left_for_this_task=3600</em>, <em>per_run_time_limit=360</em>, <em>initial_configurations_via_metalearning=25</em>, <em>ensemble_size=50</em>, <em>ensemble_nbest=50</em>, <em>seed=1</em>, <em>ml_memory_limit=3000</em>, <em>include_estimators=None</em>, <em>include_preprocessors=None</em>, <em>resampling_strategy='holdout'</em>, <em>resampling_strategy_arguments=None</em>, <em>tmp_folder=None</em>, <em>output_folder=None</em>, <em>delete_tmp_folder_after_terminate=True</em>, <em>delete_output_folder_after_terminate=True</em>, <em>shared_mode=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autosklearn/estimators.html#AutoSklearnRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autosklearn.regression.AutoSklearnRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class implements the regression task.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>time_left_for_this_task</strong> : int, optional (default=3600)</p>
+<blockquote>
+<div><p>Time limit in seconds for the search of appropriate
+models. By increasing this value, <em>auto-sklearn</em> will find better
+configurations.</p>
+</div></blockquote>
+<p><strong>per_run_time_limit</strong> : int, optional (default=360)</p>
+<blockquote>
+<div><p>Time limit for a single call to machine learning model.</p>
+</div></blockquote>
+<p><strong>initial_configurations_via_metalearning</strong> : int, optional (default=25)</p>
+<p><strong>ensemble_size</strong> : int, optional (default=50)</p>
+<p><strong>ensemble_nbest</strong> : int, optional (default=50)</p>
+<p><strong>seed</strong> : int, optional (default=1)</p>
+<p><strong>ml_memory_limit</strong> : int, optional (3000)</p>
+<blockquote>
+<div><p>Memory limit for the machine learning algorithm. If the machine
+learning algorithm allocates tries to allocate more memory,
+its evaluation will be stopped.</p>
+</div></blockquote>
+<p><strong>include_estimators</strong> : dict, optional (None)</p>
+<blockquote>
+<div><p>If None all possible estimators are used. Otherwise specifies set of
+estimators to use</p>
+</div></blockquote>
+<p><strong>include_preprocessors</strong> : dict, optional (None)</p>
+<blockquote>
+<div><p>If None all possible preprocessors are used. Otherwise specifies set of
+preprocessors to use</p>
+</div></blockquote>
+<p><strong>resampling_strategy</strong> : string, optional (&#8216;holdout&#8217;)</p>
+<blockquote>
+<div><p>how to to handle overfitting, might need &#8216;resampling_strategy_arguments&#8217;</p>
+<ul class="simple">
+<li>&#8216;holdout&#8217;: 66:33 (train:test) split</li>
+<li>&#8216;holdout-iterative-fit&#8217;:  66:33 (train:test) split, calls iterative
+fit where possible</li>
+<li>&#8216;cv&#8217;: crossvalidation, requires &#8216;folds&#8217;</li>
+<li>&#8216;nested-cv&#8217;: crossvalidation, requires &#8216;outer-folds, &#8216;inner-folds&#8217;</li>
+<li>&#8216;partial-cv&#8217;: crossvalidation, requires &#8216;folds&#8217; , calls
+iterative fit where possible</li>
+</ul>
+</div></blockquote>
+<p><strong>resampling_strategy_arguments</strong> : dict, optional if &#8216;holdout&#8217; (None)</p>
+<blockquote>
+<div><p>Additional arguments for resampling_strategy
+* &#8216;holdout&#8217;: None
+* &#8216;holdout-iterative-fit&#8217;:  None
+* &#8216;cv&#8217;: {&#8216;folds&#8217;: int}
+* &#8216;nested-cv&#8217;: {&#8216;outer_folds&#8217;: int, &#8216;inner_folds&#8217;
+* &#8216;partial-cv&#8217;: {&#8216;folds&#8217;: int}</p>
+</div></blockquote>
+<p><strong>tmp_folder</strong> : string, optional (None)</p>
+<blockquote>
+<div><p>folder to store configuration output, if None automatically use
+/tmp/autosklearn_tmp_$pid_$random_number</p>
+</div></blockquote>
+<p><strong>output_folder</strong> : string, optional (None)</p>
+<blockquote>
+<div><p>folder to store trained models, if None automatically use
+/tmp/autosklearn_output_$pid_$random_number</p>
+</div></blockquote>
+<p><strong>delete_tmp_folder_after_terminate: string, optional (True)</strong></p>
+<blockquote>
+<div><p>remove tmp_folder, when finished. If tmp_folder is None
+tmp_dir will always be deleted</p>
+</div></blockquote>
+<p><strong>delete_output_folder_after_terminate: bool, optional (True)</strong></p>
+<blockquote>
+<div><p>remove output_folder, when finished. If output_folder is None
+output_dir will always be deleted</p>
+</div></blockquote>
+<p><strong>shared_mode: bool, optional (False)</strong></p>
+<blockquote class="last">
+<div><p>run smac in shared-model-node. This only works if arguments
+tmp_folder and output_folder are given and sets both
+delete_tmp_folder_after_terminate and
+delete_output_folder_after_terminate to False.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="autosklearn.regression.AutoSklearnRegressor.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>metric='r2_metric'</em>, <em>feat_type=None</em>, <em>dataset_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autosklearn/estimators.html#AutoSklearnRegressor.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autosklearn.regression.AutoSklearnRegressor.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit <em>autosklearn</em> to given training set (X, y).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : array-like or sparse matrix of shape = [n_samples, n_features]</p>
+<blockquote>
+<div><p>The training input samples.</p>
+</div></blockquote>
+<p><strong>y</strong> : array-like, shape = [n_samples] or [n_samples, n_outputs]</p>
+<blockquote>
+<div><p>The regression target.</p>
+</div></blockquote>
+<p><strong>metric</strong> : str, optional (default=&#8217;r2_metric&#8217;)</p>
+<blockquote>
+<div><p>The metric to optimize for. Can be one of: [&#8216;r2_metric&#8217;,
+&#8216;a_metric&#8217;]. A description of the metrics can be found in
+<a class="reference external" href="http://www.causality.inf.ethz.ch/AutoML/automl_ijcnn15.pdf">the paper describing the AutoML Challenge</a>.</p>
+</div></blockquote>
+<p><strong>feat_type</strong> : list, optional (default=None)</p>
+<blockquote>
+<div><p>List of str of <cite>len(X.shape[1])</cite> describing the attribute type.
+Possible types are <cite>Categorical</cite> and <cite>Numerical</cite>. <cite>Categorical</cite>
+attributes will be automatically One-Hot encoded.</p>
+</div></blockquote>
+<p><strong>dataset_name</strong> : str, optional (default=None)</p>
+<blockquote>
+<div><p>Create nicer output. If None, a string will be determined by the
+md5 hash of the dataset.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">self</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="autosklearn.regression.AutoSklearnRegressor.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#autosklearn.regression.AutoSklearnRegressor.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep: boolean, optional</strong></p>
+<blockquote>
+<div><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : mapping of string to any</p>
+<blockquote class="last">
+<div><p>Parameter names mapped to their values.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="autosklearn.regression.AutoSklearnRegressor.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autosklearn/estimators.html#AutoSklearnRegressor.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autosklearn.regression.AutoSklearnRegressor.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict regression target for X.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : array-like or sparse matrix of shape = [n_samples, n_features]</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>y</strong> : array of shape = [n_samples] or [n_samples, n_outputs]</p>
+<blockquote class="last">
+<div><p>The predicted values.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="autosklearn.regression.AutoSklearnRegressor.refit">
+<code class="descname">refit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#autosklearn.regression.AutoSklearnRegressor.refit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refit all models found with fit to new data.</p>
+<p>Necessary when using cross-validation. During training, auto-sklearn
+fits each model k times on the dataset, but does not keep any trained
+model and can therefore not be used to predict for new data points.
+This methods fits all models found during a call to fit on the data
+given. This method may also be used together with holdout to avoid
+only using 66% of the training data to fit the final model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : array-like or sparse matrix of shape = [n_samples, n_features]</p>
+<blockquote>
+<div><p>The training input samples.</p>
+</div></blockquote>
+<p><strong>y</strong> : array-like, shape = [n_samples] or [n_samples, n_outputs]</p>
+<blockquote>
+<div><p>The targets.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">self</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="autosklearn.regression.AutoSklearnRegressor.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#autosklearn.regression.AutoSklearnRegressor.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The former have parameters of the form
+<code class="docutils literal"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it&#8217;s possible to update each
+component of a nested object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="autosklearn.regression.AutoSklearnRegressor.show_models">
+<code class="descname">show_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autosklearn.regression.AutoSklearnRegressor.show_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a representation of the final ensemble found by auto-sklearn</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str</td>
 </tr>
 </tbody>
 </table>

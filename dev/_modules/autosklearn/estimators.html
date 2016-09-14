@@ -122,11 +122,14 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">autosklearn.automl</span>
 <span class="kn">from</span> <span class="nn">autosklearn.constants</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">autosklearn.util.backend</span> <span class="k">import</span> <span class="n">create</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">BaseEstimator</span>
+<span class="kn">import</span> <span class="nn">sklearn.utils</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span>
 
 
 <span class="k">class</span> <span class="nc">AutoMLDecorator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -514,7 +517,17 @@
             <span class="n">feat_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="p">):</span>
+        <span class="c1"># From sklearn.tree.DecisionTreeClassifier</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">check_array</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">accept_sparse</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">,</span>
+                                      <span class="n">force_all_finite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+            <span class="n">X</span><span class="o">.</span><span class="n">sort_indices</span><span class="p">()</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;A column-vector y was passed when a 1d array was&quot;</span>
+                          <span class="s2">&quot; expected. Please change the shape of y to &quot;</span>
+                          <span class="s2">&quot;(n_samples,), for example using ravel().&quot;</span><span class="p">,</span>
+                          <span class="n">sklearn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">DataConversionWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># reshape is necessary to preserve the data contiguity against vs</span>

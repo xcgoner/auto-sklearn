@@ -197,6 +197,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">show_models</span><span class="p">()</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">grid_scores_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">grid_scores_</span>
+
 
 <span class="k">class</span> <span class="nc">AutoSklearnEstimator</span><span class="p">(</span><span class="n">AutoMLDecorator</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
 
@@ -289,6 +293,18 @@
 <span class="sd">            tmp_folder and output_folder are given and sets both</span>
 <span class="sd">            delete_tmp_folder_after_terminate and</span>
 <span class="sd">            delete_output_folder_after_terminate to False.</span>
+
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        grid_scores\_ : list of named tuples</span>
+<span class="sd">            Contains scores for all parameter combinations in param_grid.</span>
+<span class="sd">            Each entry corresponds to one parameter setting.</span>
+<span class="sd">            Each named tuple has the attributes:</span>
+
+<span class="sd">            * ``parameters``, a dict of parameter settings</span>
+<span class="sd">            * ``mean_validation_score``, the mean score over the</span>
+<span class="sd">              cross-validation folds</span>
+<span class="sd">            * ``cv_validation_scores``, the list of scores for each fold</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_left_for_this_task</span> <span class="o">=</span> <span class="n">time_left_for_this_task</span>

@@ -207,6 +207,9 @@
     <span class="k">def</span> <span class="nf">cv_results_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">cv_results_</span>
 
+    <span class="k">def</span> <span class="nf">sprint_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">sprint_statistics</span><span class="p">()</span>
+
 
 <span class="k">class</span> <span class="nc">AutoSklearnEstimator</span><span class="p">(</span><span class="n">AutoMLDecorator</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
 

@@ -142,11 +142,24 @@ system. In this mode, the SMAC algorithm shares the training data for it&#8217;s
 model by writing it to disk after every iteration. At the beginning of each
 iteration, SMAC loads all newly found data points. An example can be found in
 the example directory.</p>
+<p>In it&#8217;s default mode, auto-sklearn already uses two cores. The first one is
+used for model building, the second for building an ensemble every time a new
+machine learning model has finished training. The file <cite>example_sequential
+.py</cite> in the example directory describes how to run these tasks sequentially
+to use only a single core at a time.</p>
+<p>Furthermore, depending on the installation of scikit-learn and numpy,
+the model building procedure may use up to all cores. Such behaviour is
+unintended by auto-sklearn and is most likely due to numpy being installed
+from <cite>pypi</cite> as a binary wheel (<a href="#id2"><span class="problematic" id="id3">`see here http://scikit-learn-general.narkive
+.com/44ywvAHA/binary-wheel-packages-for-linux-are-coming`_</span></a>). Executing
+<cite>export OPENBLAS_NUM_THREADS=1</cite> should disable such behaviours and make numpy</p>
+<blockquote>
+<div>only use a single core at a time.</div></blockquote>
 </div>
 <div class="section" id="model-persistence">
 <h2>Model persistence<a class="headerlink" href="#model-persistence" title="Permalink to this headline">¶</a></h2>
 <p>auto-sklearn is mostly a wrapper around scikit-learn. Therefore, it is
-possible to follow the <a href="#id2"><span class="problematic" id="id3">`persistence example
+possible to follow the <a href="#id4"><span class="problematic" id="id5">`persistence example
 http://scikit-learn.org/stable/modules/model_persistence.html#persistence-example`_</span></a>
 from scikit-learn.</p>
 </div>

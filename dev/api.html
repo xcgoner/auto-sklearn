@@ -146,32 +146,52 @@
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>time_left_for_this_task</strong> : int, optional (default=3600)</p>
 <blockquote>
 <div><p>Time limit in seconds for the search of appropriate
-models. By increasing this value, <em>auto-sklearn</em> will find better
-configurations.</p>
+models. By increasing this value, <em>auto-sklearn</em> has a higher
+chance of finding better models.</p>
 </div></blockquote>
 <p><strong>per_run_time_limit</strong> : int, optional (default=360)</p>
 <blockquote>
-<div><p>Time limit for a single call to machine learning model.</p>
+<div><p>Time limit for a single call to the machine learning model.
+Model fitting will be terminated if the machine learning
+algorithm runs over the time limit. Set this value high enough so
+that typical machine learning algorithms can be fit on the
+training data.</p>
 </div></blockquote>
 <p><strong>initial_configurations_via_metalearning</strong> : int, optional (default=25)</p>
+<blockquote>
+<div><p>Initialize the hyperparameter optimization algorithm with this
+many configurations which worked well on previously seen
+datasets. Disable if the hyperparameter optimization algorithm
+should start from scratch.</p>
+</div></blockquote>
 <p><strong>ensemble_size</strong> : int, optional (default=50)</p>
+<blockquote>
+<div><p>Number of models added to the ensemble built by <a href="#id1"><span class="problematic" id="id2">`</span></a>Ensemble
+selection from libraries of models. Models are drawn with
+replacement.</p>
+</div></blockquote>
 <p><strong>ensemble_nbest</strong> : int, optional (default=50)</p>
+<blockquote>
+<div><p>Only consider the <code class="docutils literal"><span class="pre">ensemble_nbest</span></code> models when building an
+ensemble. Implements <cite>Model Library Pruning</cite> from <cite>Getting the
+most out of ensemble selection</cite>.</p>
+</div></blockquote>
 <p><strong>seed</strong> : int, optional (default=1)</p>
 <p><strong>ml_memory_limit</strong> : int, optional (3000)</p>
 <blockquote>
-<div><p>Memory limit for the machine learning algorithm. If the machine
-learning algorithm allocates tries to allocate more memory,
-its evaluation will be stopped.</p>
+<div><p>Memory limit in MB for the machine learning algorithm.
+<cite>auto-sklearn</cite> will stop fitting the machine learning algorithm if
+it tries to allocate more than <cite>ml_memory_limit</cite> MB.</p>
 </div></blockquote>
 <p><strong>include_estimators</strong> : dict, optional (None)</p>
 <blockquote>
-<div><p>If None all possible estimators are used. Otherwise specifies set of
-estimators to use</p>
+<div><p>If None, all possible estimators are used. Otherwise specifies
+set of estimators to use</p>
 </div></blockquote>
 <p><strong>include_preprocessors</strong> : dict, optional (None)</p>
 <blockquote>
-<div><p>If None all possible preprocessors are used. Otherwise specifies set of
-preprocessors to use</p>
+<div><p>If None all possible preprocessors are used. Otherwise specifies set
+of preprocessors to use</p>
 </div></blockquote>
 <p><strong>resampling_strategy</strong> : string, optional (&#8216;holdout&#8217;)</p>
 <blockquote>
@@ -182,8 +202,6 @@ preprocessors to use</p>
 fit where possible</li>
 <li>&#8216;cv&#8217;: crossvalidation, requires &#8216;folds&#8217;</li>
 <li>&#8216;nested-cv&#8217;: crossvalidation, requires &#8216;outer-folds, &#8216;inner-folds&#8217;</li>
-<li>&#8216;partial-cv&#8217;: crossvalidation, requires &#8216;folds&#8217; , calls
-iterative fit where possible</li>
 </ul>
 </div></blockquote>
 <p><strong>resampling_strategy_arguments</strong> : dict, optional if &#8216;holdout&#8217; (None)</p>
@@ -192,18 +210,17 @@ iterative fit where possible</li>
 * &#8216;holdout&#8217;: None
 * &#8216;holdout-iterative-fit&#8217;:  None
 * &#8216;cv&#8217;: {&#8216;folds&#8217;: int}
-* &#8216;nested-cv&#8217;: {&#8216;outer_folds&#8217;: int, &#8216;inner_folds&#8217;
-* &#8216;partial-cv&#8217;: {&#8216;folds&#8217;: int}</p>
+* &#8216;nested-cv&#8217;: {&#8216;outer_folds&#8217;: int, &#8216;inner_folds&#8217;</p>
 </div></blockquote>
 <p><strong>tmp_folder</strong> : string, optional (None)</p>
 <blockquote>
-<div><p>folder to store configuration output, if None automatically use
-/tmp/autosklearn_tmp_$pid_$random_number</p>
+<div><p>folder to store configuration output and log files, if <code class="docutils literal"><span class="pre">None</span></code>
+automatically use <code class="docutils literal"><span class="pre">/tmp/autosklearn_tmp_$pid_$random_number</span></code></p>
 </div></blockquote>
 <p><strong>output_folder</strong> : string, optional (None)</p>
 <blockquote>
-<div><p>folder to store trained models, if None automatically use
-/tmp/autosklearn_output_$pid_$random_number</p>
+<div><p>folder to store predictions for optional test set, if <code class="docutils literal"><span class="pre">None</span></code>
+automatically use <code class="docutils literal"><span class="pre">/tmp/autosklearn_output_$pid_$random_number</span></code></p>
 </div></blockquote>
 <p><strong>delete_tmp_folder_after_terminate: string, optional (True)</strong></p>
 <blockquote>
@@ -217,10 +234,10 @@ output_dir will always be deleted</p>
 </div></blockquote>
 <p><strong>shared_mode: bool, optional (False)</strong></p>
 <blockquote class="last">
-<div><p>run smac in shared-model-node. This only works if arguments
-tmp_folder and output_folder are given and sets both
-delete_tmp_folder_after_terminate and
-delete_output_folder_after_terminate to False.</p>
+<div><p>Run smac in shared-model-node. This only works if arguments
+<code class="docutils literal"><span class="pre">tmp_folder</span></code> and <code class="docutils literal"><span class="pre">output_folder</span></code> are given and both
+<code class="docutils literal"><span class="pre">delete_tmp_folder_after_terminate</span></code> and
+<code class="docutils literal"><span class="pre">delete_output_folder_after_terminate</span></code> are set to False.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -236,12 +253,15 @@ delete_output_folder_after_terminate to False.</p>
 <tr class="row-odd"><td>grid_scores_</td>
 <td>(list of named tuples) Contains scores for all parameter combinations in param_grid. Each entry corresponds to one parameter setting. Each named tuple has the attributes:  * <code class="docutils literal"><span class="pre">parameters</span></code>, a dict of parameter settings * <code class="docutils literal"><span class="pre">mean_validation_score</span></code>, the mean score over the cross-validation folds * <code class="docutils literal"><span class="pre">cv_validation_scores</span></code>, the list of scores for each fold</td>
 </tr>
+<tr class="row-even"><td><a href="#id11"><span class="problematic" id="id12">cv_results_</span></a></td>
+<td>(dict of numpy (masked) ndarrays) A dict with keys as column headers and values as columns, that can be imported into a pandas <code class="docutils literal"><span class="pre">DataFrame</span></code>.  This attribute is a backward port to already support the advanced output of scikit-learn 0.18. Not all keys returned by scikit-learn are supported yet.</td>
+</tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="autosklearn.classification.AutoSklearnClassifier.fit">
 <code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>metric='acc_metric'</em>, <em>feat_type=None</em>, <em>dataset_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autosklearn/estimators.html#AutoSklearnClassifier.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fit <em>autosklearn</em> to given training set (X, y).</p>
+<dd><p>Fit <em>auto-sklearn</em> to given training set (X, y).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -427,32 +447,52 @@ component of a nested object.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>time_left_for_this_task</strong> : int, optional (default=3600)</p>
 <blockquote>
 <div><p>Time limit in seconds for the search of appropriate
-models. By increasing this value, <em>auto-sklearn</em> will find better
-configurations.</p>
+models. By increasing this value, <em>auto-sklearn</em> has a higher
+chance of finding better models.</p>
 </div></blockquote>
 <p><strong>per_run_time_limit</strong> : int, optional (default=360)</p>
 <blockquote>
-<div><p>Time limit for a single call to machine learning model.</p>
+<div><p>Time limit for a single call to the machine learning model.
+Model fitting will be terminated if the machine learning
+algorithm runs over the time limit. Set this value high enough so
+that typical machine learning algorithms can be fit on the
+training data.</p>
 </div></blockquote>
 <p><strong>initial_configurations_via_metalearning</strong> : int, optional (default=25)</p>
+<blockquote>
+<div><p>Initialize the hyperparameter optimization algorithm with this
+many configurations which worked well on previously seen
+datasets. Disable if the hyperparameter optimization algorithm
+should start from scratch.</p>
+</div></blockquote>
 <p><strong>ensemble_size</strong> : int, optional (default=50)</p>
+<blockquote>
+<div><p>Number of models added to the ensemble built by <a href="#id3"><span class="problematic" id="id4">`</span></a>Ensemble
+selection from libraries of models. Models are drawn with
+replacement.</p>
+</div></blockquote>
 <p><strong>ensemble_nbest</strong> : int, optional (default=50)</p>
+<blockquote>
+<div><p>Only consider the <code class="docutils literal"><span class="pre">ensemble_nbest</span></code> models when building an
+ensemble. Implements <cite>Model Library Pruning</cite> from <cite>Getting the
+most out of ensemble selection</cite>.</p>
+</div></blockquote>
 <p><strong>seed</strong> : int, optional (default=1)</p>
 <p><strong>ml_memory_limit</strong> : int, optional (3000)</p>
 <blockquote>
-<div><p>Memory limit for the machine learning algorithm. If the machine
-learning algorithm allocates tries to allocate more memory,
-its evaluation will be stopped.</p>
+<div><p>Memory limit in MB for the machine learning algorithm.
+<cite>auto-sklearn</cite> will stop fitting the machine learning algorithm if
+it tries to allocate more than <cite>ml_memory_limit</cite> MB.</p>
 </div></blockquote>
 <p><strong>include_estimators</strong> : dict, optional (None)</p>
 <blockquote>
-<div><p>If None all possible estimators are used. Otherwise specifies set of
-estimators to use</p>
+<div><p>If None, all possible estimators are used. Otherwise specifies
+set of estimators to use</p>
 </div></blockquote>
 <p><strong>include_preprocessors</strong> : dict, optional (None)</p>
 <blockquote>
-<div><p>If None all possible preprocessors are used. Otherwise specifies set of
-preprocessors to use</p>
+<div><p>If None all possible preprocessors are used. Otherwise specifies set
+of preprocessors to use</p>
 </div></blockquote>
 <p><strong>resampling_strategy</strong> : string, optional (&#8216;holdout&#8217;)</p>
 <blockquote>
@@ -463,8 +503,6 @@ preprocessors to use</p>
 fit where possible</li>
 <li>&#8216;cv&#8217;: crossvalidation, requires &#8216;folds&#8217;</li>
 <li>&#8216;nested-cv&#8217;: crossvalidation, requires &#8216;outer-folds, &#8216;inner-folds&#8217;</li>
-<li>&#8216;partial-cv&#8217;: crossvalidation, requires &#8216;folds&#8217; , calls
-iterative fit where possible</li>
 </ul>
 </div></blockquote>
 <p><strong>resampling_strategy_arguments</strong> : dict, optional if &#8216;holdout&#8217; (None)</p>
@@ -473,18 +511,17 @@ iterative fit where possible</li>
 * &#8216;holdout&#8217;: None
 * &#8216;holdout-iterative-fit&#8217;:  None
 * &#8216;cv&#8217;: {&#8216;folds&#8217;: int}
-* &#8216;nested-cv&#8217;: {&#8216;outer_folds&#8217;: int, &#8216;inner_folds&#8217;
-* &#8216;partial-cv&#8217;: {&#8216;folds&#8217;: int}</p>
+* &#8216;nested-cv&#8217;: {&#8216;outer_folds&#8217;: int, &#8216;inner_folds&#8217;</p>
 </div></blockquote>
 <p><strong>tmp_folder</strong> : string, optional (None)</p>
 <blockquote>
-<div><p>folder to store configuration output, if None automatically use
-/tmp/autosklearn_tmp_$pid_$random_number</p>
+<div><p>folder to store configuration output and log files, if <code class="docutils literal"><span class="pre">None</span></code>
+automatically use <code class="docutils literal"><span class="pre">/tmp/autosklearn_tmp_$pid_$random_number</span></code></p>
 </div></blockquote>
 <p><strong>output_folder</strong> : string, optional (None)</p>
 <blockquote>
-<div><p>folder to store trained models, if None automatically use
-/tmp/autosklearn_output_$pid_$random_number</p>
+<div><p>folder to store predictions for optional test set, if <code class="docutils literal"><span class="pre">None</span></code>
+automatically use <code class="docutils literal"><span class="pre">/tmp/autosklearn_output_$pid_$random_number</span></code></p>
 </div></blockquote>
 <p><strong>delete_tmp_folder_after_terminate: string, optional (True)</strong></p>
 <blockquote>
@@ -498,10 +535,10 @@ output_dir will always be deleted</p>
 </div></blockquote>
 <p><strong>shared_mode: bool, optional (False)</strong></p>
 <blockquote class="last">
-<div><p>run smac in shared-model-node. This only works if arguments
-tmp_folder and output_folder are given and sets both
-delete_tmp_folder_after_terminate and
-delete_output_folder_after_terminate to False.</p>
+<div><p>Run smac in shared-model-node. This only works if arguments
+<code class="docutils literal"><span class="pre">tmp_folder</span></code> and <code class="docutils literal"><span class="pre">output_folder</span></code> are given and both
+<code class="docutils literal"><span class="pre">delete_tmp_folder_after_terminate</span></code> and
+<code class="docutils literal"><span class="pre">delete_output_folder_after_terminate</span></code> are set to False.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -516,6 +553,9 @@ delete_output_folder_after_terminate to False.</p>
 <tbody valign="top">
 <tr class="row-odd"><td>grid_scores_</td>
 <td>(list of named tuples) Contains scores for all parameter combinations in param_grid. Each entry corresponds to one parameter setting. Each named tuple has the attributes:  * <code class="docutils literal"><span class="pre">parameters</span></code>, a dict of parameter settings * <code class="docutils literal"><span class="pre">mean_validation_score</span></code>, the mean score over the cross-validation folds * <code class="docutils literal"><span class="pre">cv_validation_scores</span></code>, the list of scores for each fold</td>
+</tr>
+<tr class="row-even"><td><a href="#id13"><span class="problematic" id="id14">cv_results_</span></a></td>
+<td>(dict of numpy (masked) ndarrays) A dict with keys as column headers and values as columns, that can be imported into a pandas <code class="docutils literal"><span class="pre">DataFrame</span></code>.  This attribute is a backward port to already support the advanced output of scikit-learn 0.18. Not all keys returned by scikit-learn are supported yet.</td>
 </tr>
 </tbody>
 </table>

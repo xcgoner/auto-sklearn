@@ -152,9 +152,8 @@ the model building procedure may use up to all cores. Such behaviour is
 unintended by auto-sklearn and is most likely due to numpy being installed
 from <cite>pypi</cite> as a binary wheel (<a href="#id2"><span class="problematic" id="id3">`see here http://scikit-learn-general.narkive
 .com/44ywvAHA/binary-wheel-packages-for-linux-are-coming`_</span></a>). Executing
-<cite>export OPENBLAS_NUM_THREADS=1</cite> should disable such behaviours and make numpy</p>
-<blockquote>
-<div>only use a single core at a time.</div></blockquote>
+<code class="docutils literal"><span class="pre">export</span> <span class="pre">OPENBLAS_NUM_THREADS=1</span></code> should disable such behaviours and make numpy
+only use a single core at a time.</p>
 </div>
 <div class="section" id="model-persistence">
 <h2>Model persistence<a class="headerlink" href="#model-persistence" title="Permalink to this headline">¶</a></h2>

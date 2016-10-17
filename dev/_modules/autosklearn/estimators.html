@@ -169,7 +169,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">refit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">fit_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s1">&#39;32&#39;</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">fit_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s1">&#39;32&#39;</span><span class="p">,</span>
                      <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ensemble_nbest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">ensemble_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Build the ensemble.</span>
@@ -180,7 +180,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        self</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit_ensemble</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit_ensemble</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span>
                                          <span class="n">dataset_name</span><span class="p">,</span> <span class="n">ensemble_nbest</span><span class="p">,</span>
                                          <span class="n">ensemble_size</span><span class="p">)</span>
 
@@ -375,12 +375,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_automl</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnEstimator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">fit_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s1">&#39;32&#39;</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">fit_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s1">&#39;32&#39;</span><span class="p">,</span>
                      <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ensemble_nbest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">ensemble_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_automl</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit_ensemble</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit_ensemble</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span>
                                          <span class="n">dataset_name</span><span class="p">,</span> <span class="n">ensemble_nbest</span><span class="p">,</span>
                                          <span class="n">ensemble_size</span><span class="p">)</span>
 
@@ -548,6 +548,27 @@
                                       <span class="n">force_all_finite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
             <span class="n">X</span><span class="o">.</span><span class="n">sort_indices</span><span class="p">()</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_target_classes</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_outputs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">MULTILABEL_CLASSIFICATION</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_classes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="n">BINARY_CLASSIFICATION</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="n">MULTICLASS_CLASSIFICATION</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">feat_type</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">fit_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s1">&#39;32&#39;</span><span class="p">,</span>
+                     <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ensemble_nbest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">ensemble_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_process_target_classes</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit_ensemble</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">,</span>
+                                         <span class="n">ensemble_nbest</span><span class="p">,</span> <span class="n">ensemble_size</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_process_target_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;A column-vector y was passed when a 1d array was&quot;</span>
@@ -574,19 +595,12 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_classes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_outputs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">task</span> <span class="o">=</span> <span class="n">MULTILABEL_CLASSIFICATION</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_classes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">task</span> <span class="o">=</span> <span class="n">BINARY_CLASSIFICATION</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">task</span> <span class="o">=</span> <span class="n">MULTICLASS_CLASSIFICATION</span>
-
         <span class="c1"># TODO: fix metafeatures calculation to allow this!</span>
         <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">feat_type</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">y</span>
+
 
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="n">predicted_probabilities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>

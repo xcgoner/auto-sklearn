@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>autosklearn.estimators &#8212; AutoSklearn 0.0.2 documentation</title>
+    <title>autosklearn.estimators &#8212; AutoSklearn 0.1.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.2',
+        VERSION:     '0.1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -29,7 +29,9 @@
     <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="AutoSklearn 0.0.2 documentation" href="../../index.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="top" title="AutoSklearn 0.1.0 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -65,7 +67,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           auto-sklearn</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -74,7 +76,7 @@
                 <li><a href="../../index.html">Start</a></li>
                 <li><a href="../../api.html">API</a></li>
                 <li><a href="../../extending.html">Extending</a></li>
-                <li><a href="../../resampling.html">Resampling</a></li>
+                <li><a href="../../manual.html">Manual</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -119,92 +121,97 @@
       
   <h1>Source code for autosklearn.estimators</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- encoding: utf-8 -*-</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">random</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">autosklearn.automl</span>
 <span class="kn">from</span> <span class="nn">autosklearn.constants</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">autosklearn.util.backend</span> <span class="k">import</span> <span class="n">create</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">BaseEstimator</span>
+<span class="kn">import</span> <span class="nn">sklearn.utils</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span>
 
 
-<div class="viewcode-block" id="AutoSklearnClassifier"><a class="viewcode-back" href="../../api.html#autosklearn.classification.AutoSklearnClassifier">[docs]</a><span class="k">class</span> <span class="nc">AutoSklearnClassifier</span><span class="p">(</span><span class="n">autosklearn</span><span class="o">.</span><span class="n">automl</span><span class="o">.</span><span class="n">AutoML</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;This class implements the classification task. It must not be pickled!</span>
+<span class="k">class</span> <span class="nc">AutoMLDecorator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    time_left_for_this_task : int, optional (default=3600)</span>
-<span class="sd">        Time limit in seconds for the search for appropriate classification</span>
-<span class="sd">        models. By increasing this value, *auto-sklearn* will find better</span>
-<span class="sd">        configurations.</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">automl</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span> <span class="o">=</span> <span class="n">automl</span>
 
-<span class="sd">    per_run_time_limit : int, optional (default=360)</span>
-<span class="sd">        Time limit for a single call to machine learning model.</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="sd">    initial_configurations_via_metalearning : int, optional (default=25)</span>
+    <span class="k">def</span> <span class="nf">refit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Refit all models found with fit to new data.</span>
 
-<span class="sd">    ensemble_size : int, optional (default=50)</span>
+<span class="sd">        Necessary when using cross-validation. During training, auto-sklearn</span>
+<span class="sd">        fits each model k times on the dataset, but does not keep any trained</span>
+<span class="sd">        model and can therefore not be used to predict for new data points.</span>
+<span class="sd">        This methods fits all models found during a call to fit on the data</span>
+<span class="sd">        given. This method may also be used together with holdout to avoid</span>
+<span class="sd">        only using 66% of the training data to fit the final model.</span>
 
-<span class="sd">    ensemble_nbest : int, optional (default=50)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
 
-<span class="sd">    seed : int, optional (default=1)</span>
+<span class="sd">        X : array-like or sparse matrix of shape = [n_samples, n_features]</span>
+<span class="sd">            The training input samples.</span>
 
-<span class="sd">    ml_memory_limit : int, optional (3000)</span>
-<span class="sd">        Memory limit for the machine learning algorithm. If the machine</span>
-<span class="sd">        learning algorithm allocates tries to allocate more memory,</span>
-<span class="sd">        its evaluation will be stopped.</span>
+<span class="sd">        y : array-like, shape = [n_samples] or [n_samples, n_outputs]</span>
+<span class="sd">            The targets.</span>
 
-<span class="sd">    include_estimators : dict, optional (None)</span>
-<span class="sd">        If None all possible estimators are used. Otherwise specifies set of</span>
-<span class="sd">        estimators to use</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
 
-<span class="sd">    include_preprocessors : dict, optional (None)</span>
-<span class="sd">        If None all possible preprocessors are used. Otherwise specifies set of</span>
-<span class="sd">        preprocessors to use</span>
+<span class="sd">        self</span>
 
-<span class="sd">    resampling_strategy : string, optional (&#39;holdout&#39;)</span>
-<span class="sd">        how to to handle overfitting, might need &#39;resampling_strategy_arguments&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">refit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
-<span class="sd">        * &#39;holdout&#39;: 66:33 (train:test) split</span>
-<span class="sd">        * &#39;holdout-iterative-fit&#39;:  66:33 (train:test) split, calls iterative</span>
-<span class="sd">          fit where possible</span>
-<span class="sd">        * &#39;cv&#39;: crossvalidation, requires &#39;folds&#39;</span>
-<span class="sd">        * &#39;nested-cv&#39;: crossvalidation, requires &#39;outer-folds, &#39;inner-folds&#39;</span>
-<span class="sd">        * &#39;partial-cv&#39;: crossvalidation, requires &#39;folds&#39; , calls</span>
-<span class="sd">          iterative fit where possible</span>
+    <span class="k">def</span> <span class="nf">fit_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s1">&#39;32&#39;</span><span class="p">,</span>
+                     <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ensemble_nbest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">ensemble_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build the ensemble.</span>
 
-<span class="sd">    resampling_strategy_arguments : dict, optional if &#39;holdout&#39; (None)</span>
-<span class="sd">        Additional arguments for resampling_strategy</span>
-<span class="sd">        * &#39;holdout&#39;: None</span>
-<span class="sd">        * &#39;holdout-iterative-fit&#39;:  None</span>
-<span class="sd">        * &#39;cv&#39;: {&#39;folds&#39;: int}</span>
-<span class="sd">        * &#39;nested-cv&#39;: {&#39;outer_folds&#39;: int, &#39;inner_folds&#39;</span>
-<span class="sd">        * &#39;partial-cv&#39;: {&#39;folds&#39;: int}</span>
+<span class="sd">        This method only needs to be called in the parallel mode.</span>
 
-<span class="sd">    tmp_folder : string, optional (None)</span>
-<span class="sd">        folder to store configuration output, if None automatically use</span>
-<span class="sd">        /tmp/autosklearn_tmp_$pid_$random_number</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit_ensemble</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span>
+                                         <span class="n">dataset_name</span><span class="p">,</span> <span class="n">ensemble_nbest</span><span class="p">,</span>
+                                         <span class="n">ensemble_size</span><span class="p">)</span>
 
-<span class="sd">    output_folder : string, optional (None)</span>
-<span class="sd">        folder to store trained models, if None automatically use</span>
-<span class="sd">        /tmp/autosklearn_output_$pid_$random_number</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
-<span class="sd">    delete_tmp_folder_after_terminate: string, optional (True)</span>
-<span class="sd">        remove tmp_folder, when finished. If tmp_folder is None</span>
-<span class="sd">        tmp_dir will always be deleted</span>
+    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
-<span class="sd">    delete_output_folder_after_terminate: bool, optional (True)</span>
-<span class="sd">        remove output_folder, when finished. If output_folder is None</span>
-<span class="sd">        output_dir will always be deleted</span>
+    <span class="k">def</span> <span class="nf">show_models</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a representation of the final ensemble found by auto-sklearn</span>
 
-<span class="sd">    shared_mode: bool, optional (False)</span>
-<span class="sd">        run smac in shared-model-node. This only works if arguments</span>
-<span class="sd">        tmp_folder and output_folder are given and sets both</span>
-<span class="sd">        delete_tmp_folder_after_terminate and</span>
-<span class="sd">        delete_output_folder_after_terminate to False.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">show_models</span><span class="p">()</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">grid_scores_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">grid_scores_</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cv_results_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">cv_results_</span>
+
+    <span class="k">def</span> <span class="nf">sprint_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">sprint_statistics</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">AutoSklearnEstimator</span><span class="p">(</span><span class="n">AutoMLDecorator</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">time_left_for_this_task</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>
@@ -223,90 +230,194 @@
                  <span class="n">delete_tmp_folder_after_terminate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">delete_output_folder_after_terminate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">shared_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time_left_for_this_task : int, optional (default=3600)</span>
+<span class="sd">            Time limit in seconds for the search of appropriate</span>
+<span class="sd">            models. By increasing this value, *auto-sklearn* has a higher</span>
+<span class="sd">            chance of finding better models.</span>
 
-        <span class="c1"># Check this before _prepare_create_folders assigns random output</span>
-        <span class="c1"># directories</span>
-        <span class="k">if</span> <span class="n">shared_mode</span><span class="p">:</span>
-            <span class="n">delete_output_folder_after_terminate</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">delete_tmp_folder_after_terminate</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="n">tmp_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="sd">        per_run_time_limit : int, optional (default=360)</span>
+<span class="sd">            Time limit for a single call to the machine learning model.</span>
+<span class="sd">            Model fitting will be terminated if the machine learning</span>
+<span class="sd">            algorithm runs over the time limit. Set this value high enough so</span>
+<span class="sd">            that typical machine learning algorithms can be fit on the</span>
+<span class="sd">            training data.</span>
+
+<span class="sd">        initial_configurations_via_metalearning : int, optional (default=25)</span>
+<span class="sd">            Initialize the hyperparameter optimization algorithm with this</span>
+<span class="sd">            many configurations which worked well on previously seen</span>
+<span class="sd">            datasets. Disable if the hyperparameter optimization algorithm</span>
+<span class="sd">            should start from scratch.</span>
+
+<span class="sd">        ensemble_size : int, optional (default=50)</span>
+<span class="sd">            Number of models added to the ensemble built by `Ensemble</span>
+<span class="sd">            selection from libraries of models. Models are drawn with</span>
+<span class="sd">            replacement.</span>
+
+<span class="sd">        ensemble_nbest : int, optional (default=50)</span>
+<span class="sd">            Only consider the ``ensemble_nbest`` models when building an</span>
+<span class="sd">            ensemble. Implements `Model Library Pruning` from `Getting the</span>
+<span class="sd">            most out of ensemble selection`.</span>
+
+<span class="sd">        seed : int, optional (default=1)</span>
+
+<span class="sd">        ml_memory_limit : int, optional (3000)</span>
+<span class="sd">            Memory limit in MB for the machine learning algorithm.</span>
+<span class="sd">            `auto-sklearn` will stop fitting the machine learning algorithm if</span>
+<span class="sd">            it tries to allocate more than `ml_memory_limit` MB.</span>
+
+<span class="sd">        include_estimators : dict, optional (None)</span>
+<span class="sd">            If None, all possible estimators are used. Otherwise specifies</span>
+<span class="sd">            set of estimators to use</span>
+
+<span class="sd">        include_preprocessors : dict, optional (None)</span>
+<span class="sd">            If None all possible preprocessors are used. Otherwise specifies set</span>
+<span class="sd">            of preprocessors to use</span>
+
+<span class="sd">        resampling_strategy : string, optional (&#39;holdout&#39;)</span>
+<span class="sd">            how to to handle overfitting, might need &#39;resampling_strategy_arguments&#39;</span>
+
+<span class="sd">            * &#39;holdout&#39;: 66:33 (train:test) split</span>
+<span class="sd">            * &#39;holdout-iterative-fit&#39;:  66:33 (train:test) split, calls iterative</span>
+<span class="sd">              fit where possible</span>
+<span class="sd">            * &#39;cv&#39;: crossvalidation, requires &#39;folds&#39;</span>
+<span class="sd">            * &#39;nested-cv&#39;: crossvalidation, requires &#39;outer-folds, &#39;inner-folds&#39;</span>
+
+<span class="sd">        resampling_strategy_arguments : dict, optional if &#39;holdout&#39; (None)</span>
+<span class="sd">            Additional arguments for resampling_strategy</span>
+<span class="sd">            * &#39;holdout&#39;: None</span>
+<span class="sd">            * &#39;holdout-iterative-fit&#39;:  None</span>
+<span class="sd">            * &#39;cv&#39;: {&#39;folds&#39;: int}</span>
+<span class="sd">            * &#39;nested-cv&#39;: {&#39;outer_folds&#39;: int, &#39;inner_folds&#39;</span>
+
+<span class="sd">        tmp_folder : string, optional (None)</span>
+<span class="sd">            folder to store configuration output and log files, if ``None``</span>
+<span class="sd">            automatically use ``/tmp/autosklearn_tmp_$pid_$random_number``</span>
+
+<span class="sd">        output_folder : string, optional (None)</span>
+<span class="sd">            folder to store predictions for optional test set, if ``None``</span>
+<span class="sd">            automatically use ``/tmp/autosklearn_output_$pid_$random_number``</span>
+
+<span class="sd">        delete_tmp_folder_after_terminate: string, optional (True)</span>
+<span class="sd">            remove tmp_folder, when finished. If tmp_folder is None</span>
+<span class="sd">            tmp_dir will always be deleted</span>
+
+<span class="sd">        delete_output_folder_after_terminate: bool, optional (True)</span>
+<span class="sd">            remove output_folder, when finished. If output_folder is None</span>
+<span class="sd">            output_dir will always be deleted</span>
+
+<span class="sd">        shared_mode: bool, optional (False)</span>
+<span class="sd">            Run smac in shared-model-node. This only works if arguments</span>
+<span class="sd">            ``tmp_folder`` and ``output_folder`` are given and both</span>
+<span class="sd">            ``delete_tmp_folder_after_terminate`` and</span>
+<span class="sd">            ``delete_output_folder_after_terminate`` are set to False.</span>
+
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        grid_scores\_ : list of named tuples</span>
+<span class="sd">            Contains scores for all parameter combinations in param_grid.</span>
+<span class="sd">            Each entry corresponds to one parameter setting.</span>
+<span class="sd">            Each named tuple has the attributes:</span>
+
+<span class="sd">            * ``parameters``, a dict of parameter settings</span>
+<span class="sd">            * ``mean_validation_score``, the mean score over the</span>
+<span class="sd">              cross-validation folds</span>
+<span class="sd">            * ``cv_validation_scores``, the list of scores for each fold</span>
+
+<span class="sd">        cv_results\_ : dict of numpy (masked) ndarrays</span>
+<span class="sd">            A dict with keys as column headers and values as columns, that can be</span>
+<span class="sd">            imported into a pandas ``DataFrame``.</span>
+
+<span class="sd">            This attribute is a backward port to already support the advanced</span>
+<span class="sd">            output of scikit-learn 0.18. Not all keys returned by scikit-learn</span>
+<span class="sd">            are supported yet.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_left_for_this_task</span> <span class="o">=</span> <span class="n">time_left_for_this_task</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">per_run_time_limit</span> <span class="o">=</span> <span class="n">per_run_time_limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_configurations_via_metalearning</span> <span class="o">=</span> <span class="n">initial_configurations_via_metalearning</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensemble_size</span> <span class="o">=</span> <span class="n">ensemble_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensemble_nbest</span> <span class="o">=</span> <span class="n">ensemble_nbest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ml_memory_limit</span> <span class="o">=</span> <span class="n">ml_memory_limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_estimators</span> <span class="o">=</span> <span class="n">include_estimators</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">include_preprocessors</span> <span class="o">=</span> <span class="n">include_preprocessors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resampling_strategy</span> <span class="o">=</span> <span class="n">resampling_strategy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resampling_strategy_arguments</span> <span class="o">=</span> <span class="n">resampling_strategy_arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_folder</span> <span class="o">=</span> <span class="n">tmp_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span> <span class="o">=</span> <span class="n">output_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete_tmp_folder_after_terminate</span> <span class="o">=</span> <span class="n">delete_tmp_folder_after_terminate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete_output_folder_after_terminate</span> <span class="o">=</span> <span class="n">delete_output_folder_after_terminate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared_mode</span> <span class="o">=</span> <span class="n">shared_mode</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnEstimator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">build_automl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared_mode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delete_output_folder_after_terminate</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delete_tmp_folder_after_terminate</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;If shared_mode == True tmp_folder must not &quot;</span>
                                  <span class="s2">&quot;be None.&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">output_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;If shared_mode == True output_folder must &quot;</span>
                                  <span class="s2">&quot;not be None.&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Call this before calling superconstructor as we feed tmp/output dir</span>
-        <span class="c1"># to superinit</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_create_folders</span><span class="p">(</span>
-            <span class="n">tmp_dir</span><span class="o">=</span><span class="n">tmp_folder</span><span class="p">,</span>
-            <span class="n">output_dir</span><span class="o">=</span><span class="n">output_folder</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_classes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_n_classes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_n_outputs</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
-            <span class="n">time_left_for_this_task</span><span class="o">=</span><span class="n">time_left_for_this_task</span><span class="p">,</span>
-            <span class="n">per_run_time_limit</span><span class="o">=</span><span class="n">per_run_time_limit</span><span class="p">,</span>
-            <span class="n">log_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span><span class="p">,</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="n">create</span><span class="p">(</span><span class="n">temporary_directory</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_folder</span><span class="p">,</span>
+                         <span class="n">output_directory</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span><span class="p">,</span>
+                         <span class="n">delete_tmp_folder_after_terminate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delete_tmp_folder_after_terminate</span><span class="p">,</span>
+                         <span class="n">delete_output_folder_after_terminate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delete_output_folder_after_terminate</span><span class="p">)</span>
+        <span class="n">automl</span> <span class="o">=</span> <span class="n">autosklearn</span><span class="o">.</span><span class="n">automl</span><span class="o">.</span><span class="n">AutoML</span><span class="p">(</span>
+            <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+            <span class="n">time_left_for_this_task</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time_left_for_this_task</span><span class="p">,</span>
+            <span class="n">per_run_time_limit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">per_run_time_limit</span><span class="p">,</span>
+            <span class="n">log_dir</span><span class="o">=</span><span class="n">backend</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">,</span>
             <span class="n">initial_configurations_via_metalearning</span><span class="o">=</span>
-            <span class="n">initial_configurations_via_metalearning</span><span class="p">,</span>
-            <span class="n">ensemble_size</span><span class="o">=</span><span class="n">ensemble_size</span><span class="p">,</span>
-            <span class="n">ensemble_nbest</span><span class="o">=</span><span class="n">ensemble_nbest</span><span class="p">,</span>
-            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
-            <span class="n">ml_memory_limit</span><span class="o">=</span><span class="n">ml_memory_limit</span><span class="p">,</span>
-            <span class="n">include_estimators</span><span class="o">=</span><span class="n">include_estimators</span><span class="p">,</span>
-            <span class="n">include_preprocessors</span><span class="o">=</span><span class="n">include_preprocessors</span><span class="p">,</span>
-            <span class="n">resampling_strategy</span><span class="o">=</span><span class="n">resampling_strategy</span><span class="p">,</span>
-            <span class="n">tmp_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span><span class="p">,</span>
-            <span class="n">output_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span><span class="p">,</span>
-            <span class="n">resampling_strategy_arguments</span><span class="o">=</span><span class="n">resampling_strategy_arguments</span><span class="p">,</span>
-            <span class="n">delete_tmp_folder_after_terminate</span><span class="o">=</span><span class="n">delete_tmp_folder_after_terminate</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initial_configurations_via_metalearning</span><span class="p">,</span>
+            <span class="n">ensemble_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ensemble_size</span><span class="p">,</span>
+            <span class="n">ensemble_nbest</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ensemble_nbest</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span>
+            <span class="n">ml_memory_limit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_memory_limit</span><span class="p">,</span>
+            <span class="n">include_estimators</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">include_estimators</span><span class="p">,</span>
+            <span class="n">include_preprocessors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">include_preprocessors</span><span class="p">,</span>
+            <span class="n">resampling_strategy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resampling_strategy</span><span class="p">,</span>
+            <span class="n">resampling_strategy_arguments</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resampling_strategy_arguments</span><span class="p">,</span>
+            <span class="n">delete_tmp_folder_after_terminate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delete_tmp_folder_after_terminate</span><span class="p">,</span>
             <span class="n">delete_output_folder_after_terminate</span><span class="o">=</span>
-            <span class="n">delete_output_folder_after_terminate</span><span class="p">,</span>
-            <span class="n">shared_mode</span><span class="o">=</span><span class="n">shared_mode</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delete_output_folder_after_terminate</span><span class="p">,</span>
+            <span class="n">shared_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shared_mode</span><span class="p">)</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_prepare_create_folders</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
-        <span class="n">random_number</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">automl</span>
 
-        <span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">tmp_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">tmp_dir</span> <span class="o">=</span> <span class="s1">&#39;/tmp/autosklearn_tmp_</span><span class="si">%d</span><span class="s1">_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">random_number</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">output_dir</span> <span class="o">=</span> <span class="s1">&#39;/tmp/autosklearn_output_</span><span class="si">%d</span><span class="s1">_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">random_number</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_automl</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnEstimator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="c1"># Totally weird, this has to be created here, will be deleted in the</span>
-        <span class="c1"># first lines of fit(). If not there, creating the Backend object in the</span>
-        <span class="c1"># superclass will fail</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-            <span class="k">pass</span>
+    <span class="k">def</span> <span class="nf">fit_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s1">&#39;32&#39;</span><span class="p">,</span>
+                     <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ensemble_nbest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">ensemble_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_automl</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit_ensemble</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span>
+                                         <span class="n">dataset_name</span><span class="p">,</span> <span class="n">ensemble_nbest</span><span class="p">,</span>
+                                         <span class="n">ensemble_size</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">tmp_dir</span><span class="p">,</span> <span class="n">output_dir</span>
 
-    <span class="k">def</span> <span class="nf">_create_output_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-            <span class="k">pass</span>
+<div class="viewcode-block" id="AutoSklearnClassifier"><a class="viewcode-back" href="../../api.html#autosklearn.classification.AutoSklearnClassifier">[docs]</a><span class="k">class</span> <span class="nc">AutoSklearnClassifier</span><span class="p">(</span><span class="n">AutoSklearnEstimator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the classification task.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">build_automl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">automl</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">build_automl</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">AutoMLClassifier</span><span class="p">(</span><span class="n">automl</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AutoSklearnClassifier.fit"><a class="viewcode-back" href="../../api.html#autosklearn.classification.AutoSklearnClassifier.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
             <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;acc_metric&#39;</span><span class="p">,</span>
             <span class="n">feat_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Fit *autosklearn* to given training set (X, y).</span>
+            <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fit *auto-sklearn* to given training set (X, y).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -338,23 +449,149 @@
 <span class="sd">        self</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">feat_type</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AutoSklearnClassifier.predict"><a class="viewcode-back" href="../../api.html#autosklearn.classification.AutoSklearnClassifier.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Predict classes for X.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like or sparse matrix of shape = [n_samples, n_features]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y : array of shape = [n_samples] or [n_samples, n_labels]</span>
+<span class="sd">            The predicted classes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AutoSklearnClassifier.predict_proba"><a class="viewcode-back" href="../../api.html#autosklearn.classification.AutoSklearnClassifier.predict_proba">[docs]</a>    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Predict probabilities of classes for all samples X.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like or sparse matrix of shape = [n_samples, n_features]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y : array of shape = [n_samples, n_classes] or [n_samples, n_labels]</span>
+<span class="sd">            The predicted class probabilities.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="AutoSklearnRegressor"><a class="viewcode-back" href="../../api.html#autosklearn.classification.AutoSklearnRegressor">[docs]</a><span class="k">class</span> <span class="nc">AutoSklearnRegressor</span><span class="p">(</span><span class="n">AutoSklearnEstimator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the regression task.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">build_automl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">automl</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnRegressor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">build_automl</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">AutoMLRegressor</span><span class="p">(</span><span class="n">automl</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AutoSklearnRegressor.fit"><a class="viewcode-back" href="../../api.html#autosklearn.classification.AutoSklearnRegressor.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;r2_metric&#39;</span><span class="p">,</span>
+            <span class="n">feat_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fit *autosklearn* to given training set (X, y).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        X : array-like or sparse matrix of shape = [n_samples, n_features]</span>
+<span class="sd">            The training input samples.</span>
+
+<span class="sd">        y : array-like, shape = [n_samples] or [n_samples, n_outputs]</span>
+<span class="sd">            The regression target.</span>
+
+<span class="sd">        metric : str, optional (default=&#39;r2_metric&#39;)</span>
+<span class="sd">            The metric to optimize for. Can be one of: [&#39;r2_metric&#39;,</span>
+<span class="sd">            &#39;a_metric&#39;]. A description of the metrics can be found in</span>
+<span class="sd">            `the paper describing the AutoML Challenge</span>
+<span class="sd">            &lt;http://www.causality.inf.ethz.ch/AutoML/automl_ijcnn15.pdf&gt;`_.</span>
+
+<span class="sd">        feat_type : list, optional (default=None)</span>
+<span class="sd">            List of str of `len(X.shape[1])` describing the attribute type.</span>
+<span class="sd">            Possible types are `Categorical` and `Numerical`. `Categorical`</span>
+<span class="sd">            attributes will be automatically One-Hot encoded.</span>
+
+<span class="sd">        dataset_name : str, optional (default=None)</span>
+<span class="sd">            Create nicer output. If None, a string will be determined by the</span>
+<span class="sd">            md5 hash of the dataset.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Fit is supposed to be idempotent!</span>
+        <span class="c1"># But not if we use share_mode.</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnRegressor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">feat_type</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span></div>
 
-        <span class="c1"># But not if we use share_mode:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shared_mode</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_delete_output_directories</span><span class="p">()</span>
+<div class="viewcode-block" id="AutoSklearnRegressor.predict"><a class="viewcode-back" href="../../api.html#autosklearn.classification.AutoSklearnRegressor.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Predict regression target for X.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like or sparse matrix of shape = [n_samples, n_features]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y : array of shape = [n_samples] or [n_samples, n_outputs]</span>
+<span class="sd">            The predicted values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnRegressor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">AutoMLClassifier</span><span class="p">(</span><span class="n">AutoMLDecorator</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">automl</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_classes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_classes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_outputs</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AutoMLClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">automl</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;acc_metric&#39;</span><span class="p">,</span>
+            <span class="n">feat_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">):</span>
+        <span class="c1"># From sklearn.tree.DecisionTreeClassifier</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">check_array</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">accept_sparse</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">,</span>
+                                      <span class="n">force_all_finite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+            <span class="n">X</span><span class="o">.</span><span class="n">sort_indices</span><span class="p">()</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_target_classes</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_outputs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">MULTILABEL_CLASSIFICATION</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># If this fails, it&#39;s likely that this is the first call to get</span>
-            <span class="c1"># the data manager</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">load_datamanager</span><span class="p">()</span>
-                <span class="n">dataset_name</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">name</span>
-            <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
-                <span class="k">pass</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_classes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="n">BINARY_CLASSIFICATION</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="n">MULTICLASS_CLASSIFICATION</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_create_output_directories</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">feat_type</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">fit_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s1">&#39;32&#39;</span><span class="p">,</span>
+                     <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ensemble_nbest</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">ensemble_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_process_target_classes</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit_ensemble</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">,</span>
+                                         <span class="n">ensemble_nbest</span><span class="p">,</span> <span class="n">ensemble_size</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_process_target_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;A column-vector y was passed when a 1d array was&quot;</span>
+                          <span class="s2">&quot; expected. Please change the shape of y to &quot;</span>
+                          <span class="s2">&quot;(n_samples,), for example using ravel().&quot;</span><span class="p">,</span>
+                          <span class="n">sklearn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">DataConversionWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># reshape is necessary to preserve the data contiguity against vs</span>
@@ -375,55 +612,45 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_classes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_outputs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">task</span> <span class="o">=</span> <span class="n">MULTILABEL_CLASSIFICATION</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_classes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">task</span> <span class="o">=</span> <span class="n">BINARY_CLASSIFICATION</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">task</span> <span class="o">=</span> <span class="n">MULTICLASS_CLASSIFICATION</span>
-
         <span class="c1"># TODO: fix metafeatures calculation to allow this!</span>
         <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span>
-                                                      <span class="n">feat_type</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="AutoSklearnClassifier.predict"><a class="viewcode-back" href="../../api.html#autosklearn.classification.AutoSklearnClassifier.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Predict classes for X.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        X : array-like or sparse matrix of shape = [n_samples, n_features]</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        y : array of shape = [n_samples] or [n_samples, n_labels]</span>
-<span class="sd">            The predicted classes.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="AutoSklearnClassifier.predict_proba"><a class="viewcode-back" href="../../api.html#autosklearn.classification.AutoSklearnClassifier.predict_proba">[docs]</a>    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Predict probabilities of classes for all samples X.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        X : array-like or sparse matrix of shape = [n_samples, n_features]</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        y : array of shape = [n_samples, n_classes] or [n_samples, n_labels]</span>
-<span class="sd">            The predicted class probabilities.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">y</span>
 
 
-<span class="k">class</span> <span class="nc">AutoSklearnRegressor</span><span class="p">(</span><span class="n">autosklearn</span><span class="o">.</span><span class="n">automl</span><span class="o">.</span><span class="n">AutoML</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">predicted_probabilities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_outputs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">predicted_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predicted_probabilities</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">predicted_classes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_classes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">predicted_indexes</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">predicted_classes</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">argmax_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">,</span> <span class="n">otypes</span><span class="o">=</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span>
+            <span class="n">predicted_indexes</span> <span class="o">=</span> <span class="n">argmax_v</span><span class="p">(</span><span class="n">predicted_probabilities</span><span class="p">)</span>
+            <span class="c1">#predicted_indexes = np.argmax(predicted_probabilities, axis=1)</span>
+            <span class="n">n_samples</span> <span class="o">=</span> <span class="n">predicted_probabilities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">predicted_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_outputs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">moves</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_outputs</span><span class="p">):</span>
+                <span class="n">output_predicted_indexes</span> <span class="o">=</span> <span class="n">predicted_indexes</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">predicted_classes</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_classes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">output_predicted_indexes</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">predicted_classes</span>
+
+    <span class="k">def</span> <span class="nf">predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">AutoMLRegressor</span><span class="p">(</span><span class="n">AutoMLDecorator</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;r2_metric&#39;</span><span class="p">,</span>
+            <span class="n">feat_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">REGRESSION</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">feat_type</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -441,7 +668,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2016, Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Tobias Springenberg, Manuel Blum, Frank Hutter.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.<br/>
     </p>
   </div>
 </footer>

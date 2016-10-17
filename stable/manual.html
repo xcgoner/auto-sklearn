@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Resampling strategies &#8212; AutoSklearn 0.0.2 documentation</title>
+    <title>Manual &#8212; AutoSklearn 0.1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.2',
+        VERSION:     '0.1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -29,7 +29,9 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-    <link rel="top" title="AutoSklearn 0.0.2 documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="AutoSklearn 0.1.0 documentation" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -64,7 +66,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           auto-sklearn</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -73,7 +75,7 @@
                 <li><a href="index.html">Start</a></li>
                 <li><a href="api.html">API</a></li>
                 <li><a href="extending.html">Extending</a></li>
-                <li><a href="#">Resampling</a></li>
+                <li><a href="#">Manual</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -112,17 +114,52 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#">Resampling strategies</a></li>
+<li><a class="reference internal" href="#">Manual</a><ul>
+<li><a class="reference internal" href="#resampling-strategies">Resampling strategies</a></li>
+<li><a class="reference internal" href="#parallel-computation">Parallel computation</a></li>
+<li><a class="reference internal" href="#model-persistence">Model persistence</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <div class="section" id="resampling-strategies">
-<span id="resampling"></span><h1>Resampling strategies<a class="headerlink" href="#resampling-strategies" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="manual">
+<span id="id1"></span><h1>Manual<a class="headerlink" href="#manual" title="Permalink to this headline">¶</a></h1>
+<p>This manual shows how to use several aspects of auto-sklearn. It either
+references the examples where possible or explains certain configurations.</p>
+<div class="section" id="resampling-strategies">
+<h2>Resampling strategies<a class="headerlink" href="#resampling-strategies" title="Permalink to this headline">¶</a></h2>
 <p>Examples for using holdout and cross-validation can be found in the example
-directory.</p>
+directory of auto-sklearn.</p>
+</div>
+<div class="section" id="parallel-computation">
+<h2>Parallel computation<a class="headerlink" href="#parallel-computation" title="Permalink to this headline">¶</a></h2>
+<p>auto-sklearn supports parallel execution by data sharing on a shared file
+system. In this mode, the SMAC algorithm shares the training data for it&#8217;s
+model by writing it to disk after every iteration. At the beginning of each
+iteration, SMAC loads all newly found data points. An example can be found in
+the example directory.</p>
+<p>In it&#8217;s default mode, auto-sklearn already uses two cores. The first one is
+used for model building, the second for building an ensemble every time a new
+machine learning model has finished training. The file <cite>example_sequential
+.py</cite> in the example directory describes how to run these tasks sequentially
+to use only a single core at a time.</p>
+<p>Furthermore, depending on the installation of scikit-learn and numpy,
+the model building procedure may use up to all cores. Such behaviour is
+unintended by auto-sklearn and is most likely due to numpy being installed
+from <cite>pypi</cite> as a binary wheel (<a class="reference external" href="http://scikit-learn-general.narkive.com/44ywvAHA/binary-wheel-packages-for-linux-are-coming">see here</a>). Executing
+<code class="docutils literal"><span class="pre">export</span> <span class="pre">OPENBLAS_NUM_THREADS=1</span></code> should disable such behaviours and make numpy
+only use a single core at a time.</p>
+</div>
+<div class="section" id="model-persistence">
+<h2>Model persistence<a class="headerlink" href="#model-persistence" title="Permalink to this headline">¶</a></h2>
+<p>auto-sklearn is mostly a wrapper around scikit-learn. Therefore, it is
+possible to follow the <a class="reference external" href="http://scikit-learn.org/stable/modules/model_persistence.html#persistence-example">persistence example</a>
+from scikit-learn.</p>
+</div>
 </div>
 
 
@@ -138,14 +175,14 @@ directory.</p>
         <br/>
         
 <div id="sourcelink">
-  <a href="_sources/resampling.txt"
+  <a href="_sources/manual.txt"
      rel="nofollow">Source</a>
 </div>
       
     </p>
     <p>
         &copy; Copyright 2014-2016, Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Tobias Springenberg, Manuel Blum, Frank Hutter.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.<br/>
     </p>
   </div>
 </footer>

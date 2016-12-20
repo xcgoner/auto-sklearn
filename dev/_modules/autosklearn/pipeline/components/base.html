@@ -136,8 +136,8 @@
             <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">full_module_name</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">member_name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span>
-                        <span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="n">base_class</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">__bases__</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">base_class</span><span class="p">)</span> <span class="ow">and</span> \
+                        <span class="n">obj</span> <span class="o">!=</span> <span class="n">base_class</span><span class="p">:</span>
                     <span class="c1"># TODO test if the obj implements the interface</span>
                     <span class="c1"># Keep in mind that this only instantiates the ensemble_wrapper,</span>
                     <span class="c1"># but not the real target classifier</span>

@@ -206,6 +206,10 @@
     <span class="k">def</span> <span class="nf">cv_results_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">cv_results_</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">trajectory_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">trajectory_</span>
+
     <span class="k">def</span> <span class="nf">sprint_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">sprint_statistics</span><span class="p">()</span>
 

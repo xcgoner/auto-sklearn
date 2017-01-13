@@ -121,14 +121,10 @@
   <h1>Source code for autosklearn.pipeline.components.regression</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pkgutil</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="kn">from</span> <span class="nn">..base</span> <span class="k">import</span> <span class="n">AutoSklearnRegressionAlgorithm</span><span class="p">,</span> <span class="n">find_components</span><span class="p">,</span> \
-    <span class="n">ThirdPartyComponents</span>
+    <span class="n">ThirdPartyComponents</span><span class="p">,</span> <span class="n">AutoSklearnChoice</span>
 <span class="kn">from</span> <span class="nn">ConfigSpace.configuration_space</span> <span class="k">import</span> <span class="n">ConfigurationSpace</span>
 <span class="kn">from</span> <span class="nn">ConfigSpace.hyperparameters</span> <span class="k">import</span> <span class="n">CategoricalHyperparameter</span>
 <span class="kn">from</span> <span class="nn">ConfigSpace.conditions</span> <span class="k">import</span> <span class="n">EqualsCondition</span>
@@ -144,11 +140,7 @@
     <span class="n">_addons</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="n">regressor</span><span class="p">)</span></div>
 
 
-<span class="k">class</span> <span class="nc">RegressorChoice</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-        <span class="n">choice</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;__choice__&#39;</span><span class="p">]</span>
-        <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;__choice__&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">choice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_components</span><span class="p">()[</span><span class="n">choice</span><span class="p">](</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">RegressorChoice</span><span class="p">(</span><span class="n">AutoSklearnChoice</span><span class="p">):</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_components</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
@@ -192,8 +184,7 @@
 
         <span class="k">return</span> <span class="n">components_dict</span>
 
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_hyperparameter_search_space</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">dataset_properties</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">get_hyperparameter_search_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_properties</span><span class="p">,</span>
                                         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                         <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                         <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -203,7 +194,7 @@
         <span class="n">cs</span> <span class="o">=</span> <span class="n">ConfigurationSpace</span><span class="p">()</span>
 
         <span class="c1"># Compile a list of all estimator objects for this problem</span>
-        <span class="n">available_estimators</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">get_available_components</span><span class="p">(</span>
+        <span class="n">available_estimators</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_available_components</span><span class="p">(</span>
             <span class="n">data_prop</span><span class="o">=</span><span class="n">dataset_properties</span><span class="p">,</span>
             <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span>
             <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
@@ -228,52 +219,14 @@
                                               <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span>
         <span class="n">cs</span><span class="o">.</span><span class="n">add_hyperparameter</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">estimator_name</span> <span class="ow">in</span> <span class="n">available_estimators</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-
-            <span class="c1"># We have to retrieve the configuration space every time because</span>
-            <span class="c1"># we change the objects it returns. If we reused it, we could not</span>
-            <span class="c1"># retrieve the conditions further down</span>
-            <span class="c1"># TODO implement copy for hyperparameters and forbidden and</span>
-            <span class="c1"># conditions!</span>
-
-            <span class="n">estimator_configuration_space</span> <span class="o">=</span> <span class="n">available_estimators</span><span class="p">[</span>
-                <span class="n">estimator_name</span><span class="p">]</span><span class="o">.</span> \
+            <span class="n">estimator_configuration_space</span> <span class="o">=</span> <span class="n">available_estimators</span><span class="p">[</span><span class="n">estimator_name</span><span class="p">]</span><span class="o">.</span>\
                 <span class="n">get_hyperparameter_search_space</span><span class="p">(</span><span class="n">dataset_properties</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">estimator_configuration_space</span><span class="o">.</span><span class="n">get_hyperparameters</span><span class="p">():</span>
-                <span class="n">new_parameter</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span>
-                <span class="n">new_parameter</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
-                    <span class="n">estimator_name</span><span class="p">,</span> <span class="n">new_parameter</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-                <span class="n">cs</span><span class="o">.</span><span class="n">add_hyperparameter</span><span class="p">(</span><span class="n">new_parameter</span><span class="p">)</span>
-                <span class="c1"># We must only add a condition if the hyperparameter is not</span>
-                <span class="c1"># conditional on something else</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">estimator_configuration_space</span><span class="o">.</span>
-                        <span class="n">get_parents_of</span><span class="p">(</span><span class="n">parameter</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">condition</span> <span class="o">=</span> <span class="n">EqualsCondition</span><span class="p">(</span><span class="n">new_parameter</span><span class="p">,</span> <span class="n">estimator</span><span class="p">,</span>
-                                                <span class="n">estimator_name</span><span class="p">)</span>
-                    <span class="n">cs</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
+            <span class="n">parent_hyperparameter</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;parent&#39;</span><span class="p">:</span> <span class="n">estimator</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">estimator_name</span><span class="p">}</span>
+            <span class="n">cs</span><span class="o">.</span><span class="n">add_configuration_space</span><span class="p">(</span><span class="n">estimator_name</span><span class="p">,</span> <span class="n">estimator_configuration_space</span><span class="p">,</span>
+                                       <span class="n">parent_hyperparameter</span><span class="o">=</span><span class="n">parent_hyperparameter</span><span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">available_estimators</span><span class="p">[</span><span class="n">estimator_name</span><span class="p">]</span><span class="o">.</span> \
-                    <span class="n">get_hyperparameter_search_space</span><span class="p">(</span>
-                    <span class="n">dataset_properties</span><span class="p">)</span><span class="o">.</span><span class="n">get_conditions</span><span class="p">():</span>
-                <span class="n">dlcs</span> <span class="o">=</span> <span class="n">condition</span><span class="o">.</span><span class="n">get_descendant_literal_conditions</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">dlc</span> <span class="ow">in</span> <span class="n">dlcs</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">dlc</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">estimator_name</span><span class="p">):</span>
-                        <span class="n">dlc</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
-                            <span class="n">estimator_name</span><span class="p">,</span> <span class="n">dlc</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">dlc</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">estimator_name</span><span class="p">):</span>
-                        <span class="n">dlc</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
-                            <span class="n">estimator_name</span><span class="p">,</span> <span class="n">dlc</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-                <span class="n">cs</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
-
-            <span class="k">for</span> <span class="n">forbidden_clause</span> <span class="ow">in</span> <span class="n">available_estimators</span><span class="p">[</span><span class="n">estimator_name</span><span class="p">]</span><span class="o">.</span> \
-                    <span class="n">get_hyperparameter_search_space</span><span class="p">(</span>
-                    <span class="n">dataset_properties</span><span class="p">)</span><span class="o">.</span><span class="n">forbidden_clauses</span><span class="p">:</span>
-                <span class="n">dlcs</span> <span class="o">=</span> <span class="n">forbidden_clause</span><span class="o">.</span><span class="n">get_descendant_literal_clauses</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">dlc</span> <span class="ow">in</span> <span class="n">dlcs</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">dlc</span><span class="o">.</span><span class="n">hyperparameter</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">estimator_name</span><span class="p">):</span>
-                        <span class="n">dlc</span><span class="o">.</span><span class="n">hyperparameter</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">estimator_name</span><span class="p">,</span>
-                                                             <span class="n">dlc</span><span class="o">.</span><span class="n">hyperparameter</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-                <span class="n">cs</span><span class="o">.</span><span class="n">add_forbidden_clause</span><span class="p">(</span><span class="n">forbidden_clause</span><span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">configuration_space_</span> <span class="o">=</span> <span class="n">cs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_properties_</span> <span class="o">=</span> <span class="n">dataset_properties</span>
         <span class="k">return</span> <span class="n">cs</span>
 </pre></div>
 

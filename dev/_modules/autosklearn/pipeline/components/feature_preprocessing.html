@@ -121,14 +121,10 @@
   <h1>Source code for autosklearn.pipeline.components.feature_preprocessing</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pkgutil</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="kn">from</span> <span class="nn">..base</span> <span class="k">import</span> <span class="n">AutoSklearnPreprocessingAlgorithm</span><span class="p">,</span> <span class="n">find_components</span><span class="p">,</span> \
-    <span class="n">ThirdPartyComponents</span>
+    <span class="n">ThirdPartyComponents</span><span class="p">,</span> <span class="n">AutoSklearnChoice</span>
 <span class="kn">from</span> <span class="nn">ConfigSpace.configuration_space</span> <span class="k">import</span> <span class="n">ConfigurationSpace</span>
 <span class="kn">from</span> <span class="nn">ConfigSpace.hyperparameters</span> <span class="k">import</span> <span class="n">CategoricalHyperparameter</span>
 <span class="kn">from</span> <span class="nn">ConfigSpace.conditions</span> <span class="k">import</span> <span class="n">EqualsCondition</span><span class="p">,</span> <span class="n">AbstractConjunction</span>
@@ -144,28 +140,25 @@
     <span class="n">_addons</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span></div>
 
 
-<span class="k">class</span> <span class="nc">FeaturePreprocessorChoice</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-        <span class="n">choice</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;__choice__&#39;</span><span class="p">]</span>
-        <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;__choice__&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">choice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_components</span><span class="p">()[</span><span class="n">choice</span><span class="p">](</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">FeaturePreprocessorChoice</span><span class="p">(</span><span class="n">AutoSklearnChoice</span><span class="p">):</span>
 
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_components</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">components</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="n">components</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_preprocessors</span><span class="p">)</span>
         <span class="n">components</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_addons</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">components</span>
 
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_available_components</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">data_prop</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">get_available_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dataset_properties</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dataset_properties</span> <span class="o">=</span> <span class="p">{}</span>
+
         <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;The argument include and exclude cannot be used together.&quot;</span><span class="p">)</span>
 
-        <span class="n">available_comp</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">get_components</span><span class="p">()</span>
+        <span class="n">available_comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_components</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">incl</span> <span class="ow">in</span> <span class="n">include</span><span class="p">:</span>
@@ -188,14 +181,14 @@
             <span class="k">if</span> <span class="n">entry</span> <span class="o">==</span> <span class="n">FeaturePreprocessorChoice</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="s1">&#39;get_components&#39;</span><span class="p">):</span>
                 <span class="k">continue</span>
 
-            <span class="n">target_type</span> <span class="o">=</span> <span class="n">data_prop</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span>
+            <span class="n">target_type</span> <span class="o">=</span> <span class="n">dataset_properties</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">target_type</span> <span class="o">==</span> <span class="s1">&#39;classification&#39;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">get_properties</span><span class="p">()[</span><span class="s1">&#39;handles_classification&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">data_prop</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;multiclass&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> \
+                <span class="k">if</span> <span class="n">dataset_properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;multiclass&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> \
                         <span class="n">entry</span><span class="o">.</span><span class="n">get_properties</span><span class="p">()[</span><span class="s1">&#39;handles_multiclass&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">data_prop</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;multilabel&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> \
+                <span class="k">if</span> <span class="n">dataset_properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;multilabel&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> \
                         <span class="n">entry</span><span class="o">.</span><span class="n">get_properties</span><span class="p">()[</span><span class="s1">&#39;handles_multilabel&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                     <span class="k">continue</span>
 
@@ -210,16 +203,18 @@
 
         <span class="k">return</span> <span class="n">components_dict</span>
 
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_hyperparameter_search_space</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">dataset_properties</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">get_hyperparameter_search_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                         <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                         <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">cs</span> <span class="o">=</span> <span class="n">ConfigurationSpace</span><span class="p">()</span>
 
+        <span class="k">if</span> <span class="n">dataset_properties</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dataset_properties</span> <span class="o">=</span> <span class="p">{}</span>
+
         <span class="c1"># Compile a list of legal preprocessors for this problem</span>
-        <span class="n">available_preprocessors</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">get_available_components</span><span class="p">(</span>
-            <span class="n">data_prop</span><span class="o">=</span><span class="n">dataset_properties</span><span class="p">,</span>
+        <span class="n">available_preprocessors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_available_components</span><span class="p">(</span>
+            <span class="n">dataset_properties</span><span class="o">=</span><span class="n">dataset_properties</span><span class="p">,</span>
             <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">available_preprocessors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -242,43 +237,16 @@
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">available_preprocessors</span><span class="p">:</span>
             <span class="n">preprocessor_configuration_space</span> <span class="o">=</span> <span class="n">available_preprocessors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span> \
                 <span class="n">get_hyperparameter_search_space</span><span class="p">(</span><span class="n">dataset_properties</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">preprocessor_configuration_space</span><span class="o">.</span><span class="n">get_hyperparameters</span><span class="p">():</span>
-                <span class="n">new_parameter</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span>
-                <span class="n">new_parameter</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">new_parameter</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-                <span class="n">cs</span><span class="o">.</span><span class="n">add_hyperparameter</span><span class="p">(</span><span class="n">new_parameter</span><span class="p">)</span>
-                <span class="c1"># We must only add a condition if the hyperparameter is not</span>
-                <span class="c1"># conditional on something else</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">preprocessor_configuration_space</span><span class="o">.</span>
-                        <span class="n">get_parents_of</span><span class="p">(</span><span class="n">parameter</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">condition</span> <span class="o">=</span> <span class="n">EqualsCondition</span><span class="p">(</span><span class="n">new_parameter</span><span class="p">,</span> <span class="n">preprocessor</span><span class="p">,</span>
-                                                <span class="n">name</span><span class="p">)</span>
-                    <span class="n">cs</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
+            <span class="n">parent_hyperparameter</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;parent&#39;</span><span class="p">:</span> <span class="n">preprocessor</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">}</span>
+            <span class="n">cs</span><span class="o">.</span><span class="n">add_configuration_space</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">preprocessor_configuration_space</span><span class="p">,</span>
+                                       <span class="n">parent_hyperparameter</span><span class="o">=</span><span class="n">parent_hyperparameter</span><span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">available_preprocessors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span> \
-                    <span class="n">get_hyperparameter_search_space</span><span class="p">(</span>
-                    <span class="n">dataset_properties</span><span class="p">)</span><span class="o">.</span><span class="n">get_conditions</span><span class="p">():</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">AbstractConjunction</span><span class="p">):</span>
-                    <span class="n">dlcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">condition</span><span class="p">]</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">dlcs</span> <span class="o">=</span> <span class="n">condition</span><span class="o">.</span><span class="n">get_descendent_literal_conditions</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">dlc</span> <span class="ow">in</span> <span class="n">dlcs</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">dlc</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-                        <span class="n">dlc</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dlc</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">dlc</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-                        <span class="n">dlc</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dlc</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-                <span class="n">cs</span><span class="o">.</span><span class="n">add_condition</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
-
-            <span class="k">for</span> <span class="n">forbidden_clause</span> <span class="ow">in</span> <span class="n">available_preprocessors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span> \
-                    <span class="n">get_hyperparameter_search_space</span><span class="p">(</span>
-                    <span class="n">dataset_properties</span><span class="p">)</span><span class="o">.</span><span class="n">forbidden_clauses</span><span class="p">:</span>
-                <span class="n">dlcs</span> <span class="o">=</span> <span class="n">forbidden_clause</span><span class="o">.</span><span class="n">get_descendant_literal_clauses</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">dlc</span> <span class="ow">in</span> <span class="n">dlcs</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">dlc</span><span class="o">.</span><span class="n">hyperparameter</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-                        <span class="n">dlc</span><span class="o">.</span><span class="n">hyperparameter</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span>
-                                                             <span class="n">dlc</span><span class="o">.</span><span class="n">hyperparameter</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-                <span class="n">cs</span><span class="o">.</span><span class="n">add_forbidden_clause</span><span class="p">(</span><span class="n">forbidden_clause</span><span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">configuration_space_</span> <span class="o">=</span> <span class="n">cs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_properties_</span> <span class="o">=</span> <span class="n">dataset_properties</span>
         <span class="k">return</span> <span class="n">cs</span>
+
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 </pre></div>
 
     </div>

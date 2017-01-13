@@ -177,9 +177,9 @@ the type of component:</p>
 <p>Return an instance of <code class="docutils literal"><span class="pre">HPOlibConfigSpace.configuration_space</span>
 <span class="pre">.ConfigurationSpace</span></code>.</p>
 <p>See also the abstract definitions:
-<a class="reference internal" href="api.html#autosklearn.pipeline.components.base.AutoSklearnClassificationAlgorithm.get_hyperparameter_search_space" title="autosklearn.pipeline.components.base.AutoSklearnClassificationAlgorithm.get_hyperparameter_search_space"><code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnClassificationAlgorithm.get_hyperparameter_search_space()</span></code></a>
-<a class="reference internal" href="api.html#autosklearn.pipeline.components.base.AutoSklearnRegressionAlgorithm.get_hyperparameter_search_space" title="autosklearn.pipeline.components.base.AutoSklearnRegressionAlgorithm.get_hyperparameter_search_space"><code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnRegressionAlgorithm.get_hyperparameter_search_space()</span></code></a>
-<a class="reference internal" href="api.html#autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm.get_hyperparameter_search_space" title="autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm.get_hyperparameter_search_space"><code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnPreprocessingAlgorithm.get_hyperparameter_search_space()</span></code></a></p>
+<code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnClassificationAlgorithm.get_hyperparameter_search_space()</span></code>
+<code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnRegressionAlgorithm.get_hyperparameter_search_space()</span></code>
+<code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnPreprocessingAlgorithm.get_hyperparameter_search_space()</span></code></p>
 <p>To find out about how to create a <code class="docutils literal"><span class="pre">ConfigurationSpace</span></code>-object, please look
 at the source code on <a class="reference external" href="https://github.com/automl/auto-sklearn/tree/master/autosklearn/pipeline/components/classification">github.com</a>.</p>
 </div>
@@ -305,7 +305,7 @@ mutually exclusive with autosklearn.constants.UNSIGNED_DATA</dd>
 <h2>Classification<a class="headerlink" href="#classification" title="Permalink to this headline">¶</a></h2>
 <p>In addition two <cite>get_properties()</cite> and <cite>get_hyperparameter_search_space()</cite>
 you have to implement
-<a class="reference internal" href="api.html#autosklearn.pipeline.components.base.AutoSklearnClassificationAlgorithm.fit" title="autosklearn.pipeline.components.base.AutoSklearnClassificationAlgorithm.fit"><code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnClassificationAlgorithm.fit()</span></code></a>
+<code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnClassificationAlgorithm.fit()</span></code>
 and
 <a class="reference internal" href="api.html#autosklearn.pipeline.components.base.AutoSklearnClassificationAlgorithm.predict" title="autosklearn.pipeline.components.base.AutoSklearnClassificationAlgorithm.predict"><code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnClassificationAlgorithm.predict()</span></code></a>
 . These are an implementation of the <a class="reference external" href="http://scikit-learn.org/stable/developers/index.html#apis-of-scikit-learn-objects">scikit-learn predictor API</a>.</p>
@@ -314,7 +314,7 @@ and
 <h2>Regression<a class="headerlink" href="#regression" title="Permalink to this headline">¶</a></h2>
 <p>In addition two <cite>get_properties()</cite> and <cite>get_hyperparameter_search_space()</cite>
 you have to implement
-<a class="reference internal" href="api.html#autosklearn.pipeline.components.base.AutoSklearnRegressionAlgorithm.fit" title="autosklearn.pipeline.components.base.AutoSklearnRegressionAlgorithm.fit"><code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnRegressionAlgorithm.fit()</span></code></a>
+<code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnRegressionAlgorithm.fit()</span></code>
 and
 <a class="reference internal" href="api.html#autosklearn.pipeline.components.base.AutoSklearnRegressionAlgorithm.predict" title="autosklearn.pipeline.components.base.AutoSklearnRegressionAlgorithm.predict"><code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnRegressionAlgorithm.predict()</span></code></a>
 . These are an implementation of the <a class="reference external" href="http://scikit-learn.org/stable/developers/index.html#apis-of-scikit-learn-objects">scikit-learn predictor API</a>.</p>
@@ -323,7 +323,7 @@ and
 <h2>Feature Preprocessing<a class="headerlink" href="#feature-preprocessing" title="Permalink to this headline">¶</a></h2>
 <p>In addition two <cite>get_properties()</cite> and <cite>get_hyperparameter_search_space()</cite>
 you have to implement
-<a class="reference internal" href="api.html#autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm.fit" title="autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm.fit"><code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnPreprocessingAlgorithm.fit()</span></code></a>
+<code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnPreprocessingAlgorithm.fit()</span></code>
 and
 <a class="reference internal" href="api.html#autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm.transform" title="autosklearn.pipeline.components.base.AutoSklearnPreprocessingAlgorithm.transform"><code class="xref py py-meth docutils literal"><span class="pre">AutoSklearnPreprocessingAlgorithm.transform()</span></code></a>
 . These are an implementation of the <a class="reference external" href="http://scikit-learn.org/stable/developers/index.html#apis-of-scikit-learn-objects">scikit-learn predictor API</a>.</p>

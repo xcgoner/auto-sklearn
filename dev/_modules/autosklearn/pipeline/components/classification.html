@@ -131,7 +131,7 @@
 <span class="kn">from</span> <span class="nn">ConfigSpace.hyperparameters</span> <span class="k">import</span> <span class="n">CategoricalHyperparameter</span>
 <span class="kn">from</span> <span class="nn">ConfigSpace.conditions</span> <span class="k">import</span> <span class="n">EqualsCondition</span>
 
-<span class="n">classifier_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">__file__</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">classifier_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">_classifiers</span> <span class="o">=</span> <span class="n">find_components</span><span class="p">(</span><span class="n">__package__</span><span class="p">,</span>
                                <span class="n">classifier_directory</span><span class="p">,</span>
                                <span class="n">AutoSklearnClassificationAlgorithm</span><span class="p">)</span>
@@ -144,19 +144,19 @@
 
 <span class="k">class</span> <span class="nc">ClassifierChoice</span><span class="p">(</span><span class="n">AutoSklearnChoice</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">get_components</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_components</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="n">components</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="n">components</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_classifiers</span><span class="p">)</span>
         <span class="n">components</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_addons</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">components</span>
 
-    <span class="k">def</span> <span class="nf">get_available_components</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">dataset_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">get_available_components</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">dataset_properties</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dataset_properties</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="n">available_comp</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">get_components</span><span class="p">()</span>
+        <span class="n">available_comp</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_components</span><span class="p">()</span>
         <span class="n">components_dict</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -262,7 +262,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2016, Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Tobias Springenberg, Manuel Blum, Frank Hutter.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.<br/>
     </p>
   </div>
 </footer>

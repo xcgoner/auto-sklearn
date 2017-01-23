@@ -228,6 +228,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">configuration_space_</span> <span class="o">=</span> <span class="n">cs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset_properties_</span> <span class="o">=</span> <span class="n">dataset_properties</span>
         <span class="k">return</span> <span class="n">cs</span>
+
+    <span class="k">def</span> <span class="nf">estimator_supports_iterative_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">choice</span><span class="p">,</span> <span class="s1">&#39;iterative_fit&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">iterative_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fit_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fit_params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">iterative_fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="n">n_iter</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">configuration_fully_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">configuration_fully_fitted</span><span class="p">()</span>
 </pre></div>
 
     </div>

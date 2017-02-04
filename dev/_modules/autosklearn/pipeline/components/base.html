@@ -414,15 +414,21 @@
 <span class="sd">            * multilabel: whether the dataset is a multilabel classification</span>
 <span class="sd">              dataset</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hyperparameter_search_space</span><span class="p">(</span>
-            <span class="n">dataset_properties</span><span class="p">)</span><span class="o">.</span><span class="n">get_default_configuration</span><span class="p">()</span>
+
+        <span class="c1"># Since all calls to get_hyperparameter_search_space will be done by the</span>
+        <span class="c1"># pipeline on construction, it is not necessary to construct a</span>
+        <span class="c1"># configuration space at this location!</span>
+        <span class="c1"># self.configuration = self.get_hyperparameter_search_space(</span>
+        <span class="c1">#     dataset_properties).get_default_configuration()</span>
 
         <span class="k">if</span> <span class="n">random_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">)</span>
+        <span class="c1"># Since the pipeline will initialize the hyperparameters, it is not</span>
+        <span class="c1"># necessary to do this upon the construction of this object</span>
+        <span class="c1"># self.set_hyperparameters(self.configuration)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">choice</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">get_components</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>

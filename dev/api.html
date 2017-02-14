@@ -275,7 +275,7 @@ flag to True.</p>
 </table>
 <dl class="method">
 <dt id="autosklearn.classification.AutoSklearnClassifier.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>metric='acc_metric'</em>, <em>feat_type=None</em>, <em>dataset_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autosklearn/estimators.html#AutoSklearnClassifier.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.fit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>metric='acc_metric'</em>, <em>loss=None</em>, <em>feat_type=None</em>, <em>dataset_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autosklearn/estimators.html#AutoSklearnClassifier.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#autosklearn.classification.AutoSklearnClassifier.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit <em>auto-sklearn</em> to given training set (X, y).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -289,12 +289,19 @@ flag to True.</p>
 <blockquote>
 <div><p>The target classes.</p>
 </div></blockquote>
-<p><strong>metric</strong> : str, optional (default=&#8217;acc_metric&#8217;)</p>
+<p><strong>metric</strong> : str or callable, optional (default=&#8217;acc_metric&#8217;)</p>
 <blockquote>
 <div><p>The metric to optimize for. Can be one of: [&#8216;acc_metric&#8217;,
-&#8216;auc_metric&#8217;, &#8216;bac_metric&#8217;, &#8216;f1_metric&#8217;, &#8216;pac_metric&#8217;]. A
-description of the metrics can be found in <a class="reference external" href="http://www.causality.inf.ethz.ch/AutoML/automl_ijcnn15.pdf">the paper describing
-the AutoML Challenge</a>.</p>
+&#8216;auc_metric&#8217;, &#8216;bac_metric&#8217;, &#8216;f1_metric&#8217;, &#8216;pac_metric&#8217;], a package
+name i.e. &#8216;sklearn.metrics.accuracy_score&#8217; or a callable object
+with a signature &#8216;foo(true, prediction)&#8217;. A description of the
+metrics can be found in <a class="reference external" href="http://www.causality.inf.ethz.ch/AutoML/automl_ijcnn15.pdf">the paper describing the AutoML Challenge</a>.</p>
+</div></blockquote>
+<p><strong>loss</strong> : a package name or a callable, optional (default=None)</p>
+<blockquote>
+<div><p>If specified, defines the objective ignoring the metric argument.
+While the metric argument specifies a maximization objective,
+the loss argument specifies a minimization one.</p>
 </div></blockquote>
 <p><strong>feat_type</strong> : list, optional (default=None)</p>
 <blockquote>

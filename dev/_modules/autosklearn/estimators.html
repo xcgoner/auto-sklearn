@@ -127,6 +127,7 @@
 
 <span class="kn">import</span> <span class="nn">autosklearn.automl</span>
 <span class="kn">from</span> <span class="nn">autosklearn.constants</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">autosklearn.metrics</span> <span class="k">import</span> <span class="n">get_metric_from_loss</span>
 <span class="kn">from</span> <span class="nn">autosklearn.util.backend</span> <span class="k">import</span> <span class="n">create</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">BaseEstimator</span>
 <span class="kn">import</span> <span class="nn">sklearn.utils</span>
@@ -442,6 +443,7 @@
 
 <div class="viewcode-block" id="AutoSklearnClassifier.fit"><a class="viewcode-back" href="../../api.html#autosklearn.classification.AutoSklearnClassifier.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
             <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;acc_metric&#39;</span><span class="p">,</span>
+            <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">feat_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fit *auto-sklearn* to given training set (X, y).</span>
@@ -455,13 +457,17 @@
 <span class="sd">        y : array-like, shape = [n_samples] or [n_samples, n_outputs]</span>
 <span class="sd">            The target classes.</span>
 
-<span class="sd">        metric : str, optional (default=&#39;acc_metric&#39;)</span>
+<span class="sd">        metric : str or callable, optional (default=&#39;acc_metric&#39;)</span>
 <span class="sd">            The metric to optimize for. Can be one of: [&#39;acc_metric&#39;,</span>
-<span class="sd">            &#39;auc_metric&#39;, &#39;bac_metric&#39;, &#39;f1_metric&#39;, &#39;pac_metric&#39;]. A</span>
-<span class="sd">            description of the metrics can be found in `the paper describing</span>
-<span class="sd">            the AutoML Challenge</span>
+<span class="sd">            &#39;auc_metric&#39;, &#39;bac_metric&#39;, &#39;f1_metric&#39;, &#39;pac_metric&#39;], a package</span>
+<span class="sd">            name i.e. &#39;sklearn.metrics.accuracy_score&#39; or a callable object</span>
+<span class="sd">            with a signature &#39;foo(true, prediction)&#39;. A description of the</span>
+<span class="sd">            metrics can be found in `the paper describing the AutoML Challenge</span>
 <span class="sd">            &lt;http://www.causality.inf.ethz.ch/AutoML/automl_ijcnn15.pdf&gt;`_.</span>
-
+<span class="sd">        loss : a package name or a callable, optional (default=None)</span>
+<span class="sd">            If specified, defines the objective ignoring the metric argument.</span>
+<span class="sd">            While the metric argument specifies a maximization objective,</span>
+<span class="sd">            the loss argument specifies a minimization one.</span>
 <span class="sd">        feat_type : list, optional (default=None)</span>
 <span class="sd">            List of str of `len(X.shape[1])` describing the attribute type.</span>
 <span class="sd">            Possible types are `Categorical` and `Numerical`. `Categorical`</span>
@@ -476,7 +482,9 @@
 <span class="sd">        self</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">feat_type</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AutoSklearnClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                                                      <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span> <span class="n">feat_type</span><span class="o">=</span><span class="n">feat_type</span><span class="p">,</span>
+                                                      <span class="n">dataset_name</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AutoSklearnClassifier.predict"><a class="viewcode-back" href="../../api.html#autosklearn.classification.AutoSklearnClassifier.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Predict classes for X.</span>
@@ -584,6 +592,7 @@
 
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
             <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;acc_metric&#39;</span><span class="p">,</span>
+            <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">feat_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="p">):</span>
@@ -602,6 +611,11 @@
                 <span class="n">task</span> <span class="o">=</span> <span class="n">BINARY_CLASSIFICATION</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">task</span> <span class="o">=</span> <span class="n">MULTICLASS_CLASSIFICATION</span>
+
+        <span class="k">if</span> <span class="n">loss</span><span class="p">:</span>
+            <span class="n">metric</span> <span class="o">=</span> <span class="n">get_metric_from_loss</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">metric</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;No metric or loss function provided.&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">feat_type</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span>
 
@@ -674,10 +688,13 @@
 
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
             <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;r2_metric&#39;</span><span class="p">,</span>
+            <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">feat_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">dataset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">REGRESSION</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">feat_type</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automl</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">REGRESSION</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                                <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span> <span class="n">feat_type</span><span class="o">=</span><span class="n">feat_type</span><span class="p">,</span>
+                                <span class="n">dataset_name</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">)</span>
 </pre></div>
 
     </div>

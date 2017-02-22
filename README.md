@@ -31,6 +31,10 @@ curl https://raw.githubusercontent.com/xcgoner/auto-sklearn/0.1.1/requirements.t
 </code>
 
 <code>
+git clone -b 0.1.1 https://github.com/xcgoner/auto-sklearn.git
+</code>
+
+<code>
 make all
 </code>
 
